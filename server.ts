@@ -1,16 +1,33 @@
 import express from "express";
 import dotenv from "dotenv";
-
-import { router } from "./router";
+import morgan from "morgan";
+import "colors";
 
 dotenv.config({ path: "./config/.env" });
+
+import { router } from "./router";
+import { connect } from "./config/db";
+
+connect();
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
+process.env.NODE_ENV === "development" && app.use(morgan("dev"));
+
 app.use(router);
 
-app.listen(PORT, () =>
-  console.log(`Server running on port ${PORT} in mode ${process.env.NODE_ENV}`)
+const server = app.listen(PORT, () =>
+  console.log(
+    `Server running on port ${PORT} in mode ${process.env.NODE_ENV}`.green.bold
+  )
 );
+
+process.on("unhandledRejection", (error) => {
+  if (error instanceof Error) console.error(error.message.red.bold);
+  else if (typeof error === "string") console.error(error);
+  else throw error;
+
+  server.close(() => process.exit(1));
+});
