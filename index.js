@@ -2,25 +2,36 @@ const http = require("http");
 
 const PORT = 3000;
 
+const todos = [];
 const server = http.createServer((req, res) => {
-  const auth = req.headers["authorization"];
-  console.log("Authorization: ", auth);
-
-  res.writeHead(200, {
-    "Content-Type": "text/html",
-    "X-Powered-By": "Blabla",
-  });
+  const response = {
+    todos,
+    error: null,
+    success: true,
+  };
 
   const chunks = [];
   req
     .on("data", (chunk) => chunks.push(chunk))
     .on("end", () => {
-      console.log(Buffer.concat(chunks).toString());
-    });
+      data = JSON.parse(Buffer.concat(chunks).toString());
 
-  res.write("<h1>Header</h1>");
-  res.write("<p>Some text</p>");
-  res.end();
+      res.writeHead(200, { "Content-Type": "application/json" });
+
+      if (req.method === "GET" && req.url === "/todos") {
+        res.end(JSON.stringify(response));
+      } else if (req.method === "POST" && req.url === "/todos") {
+        if (!data?.id || !data.description) {
+          res.statusCode = 401;
+          response.error = "Not provided necessary todo data";
+          response.success = false;
+          res.end(response);
+        }
+        todos.push(data);
+        response.todos = todos;
+        res.end(JSON.stringify(response));
+      }
+    });
 });
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
