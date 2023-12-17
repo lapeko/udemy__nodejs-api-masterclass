@@ -1,23 +1,21 @@
 import { Router } from "express";
 
+import {
+  getBootcamps,
+  getBootcamp,
+  insertBootcamp,
+  deleteBootcamp,
+  putBootcamp,
+  patchBootcamp,
+} from "./bootcamp.controller";
+
 export const router = Router();
 
-router.get("/", (req, res) => {
-  res.json({ error: null, success: true });
-});
+router.route("/").get(getBootcamps).post(insertBootcamp);
 
-router.post("/", (req, res) => {
-  res.json({ error: null, success: true });
-});
-
-router.delete("/:id", (req, res) => {
-  res.json({ error: null, success: true });
-});
-
-router.put("/:id", (req, res) => {
-  res.json({ error: null, success: true });
-});
-
-router.patch("/:id", (req, res) => {
-  res.json({ error: null, success: true });
-});
+router
+  .route("/:id")
+  .get(getBootcamp)
+  .delete(deleteBootcamp)
+  .put(putBootcamp)
+  .patch(patchBootcamp);
