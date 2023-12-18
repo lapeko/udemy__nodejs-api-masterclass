@@ -1,5 +1,24 @@
 import mongoose from "mongoose";
 
+const locationSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    enum: ["Point"],
+    required: true,
+  },
+  coordinates: {
+    type: [Number],
+    required: true,
+    index: "2dsphere",
+  },
+  formattedAddress: String,
+  street: String,
+  city: String,
+  state: String,
+  zipcode: String,
+  country: String,
+});
+
 const bootcampSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -37,28 +56,14 @@ const bootcampSchema = new mongoose.Schema({
     required: [true, "Please add an address"],
   },
   location: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      required: true,
-    },
-    coordinates: {
-      type: [Number],
-      required: true,
-    },
-    formattedAddress: String,
-    street: String,
-    city: String,
-    state: String,
-    zipcode: String,
-    country: String,
+    type: locationSchema,
   },
   careers: {
     type: [String],
     required: true,
     enum: [
       "Web Development",
-      "Mobile development",
+      "Mobile Development",
       "UI/UX",
       "Data Science",
       "Business",

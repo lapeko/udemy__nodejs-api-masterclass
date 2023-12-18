@@ -1,28 +1,56 @@
 import { RequestHandler } from "express";
 
+import { Bootcamp } from "./bootcamp.model";
+
 /*
  * @description:   Get all bootcamps
  * @path:          "/api/v1/bootcamp"
  * @method:        GET
  */
-export const getBootcamps: RequestHandler = (req, res) =>
-  res.json({ error: null, success: true });
+export const getBootcamps: RequestHandler = async (req, res) => {
+  try {
+    const data = await Bootcamp.find();
+    res.json({ error: null, success: true, data });
+  } catch (e) {
+    res.status(500).json({
+      error: "Unexpected error occurred when request all bootcamps",
+      success: false,
+    });
+  }
+};
 
 /*
  * @description:   Get one bootcamp
  * @path:          "/api/v1/bootcamp/:id"
  * @method:        GET
  */
-export const getBootcamp: RequestHandler = (req, res) =>
-  res.json({ error: null, success: true });
+export const getBootcamp: RequestHandler = async (req, res) => {
+  try {
+    const data = await Bootcamp.findById(req.body.id);
+    res.json({ error: null, success: true, data });
+  } catch (e) {
+    res.status(500).json({
+      error: "Unexpected error occurred when request bootcamp",
+      success: false,
+    });
+  }
+};
 
 /*
  * @description:   Create one new bootcamp
  * @path:          "/api/v1/bootcamp"
  * @method:        POST
  */
-export const insertBootcamp: RequestHandler = (req, res) =>
-  res.json({ error: null, success: true });
+export const insertBootcamp: RequestHandler = async (req, res) => {
+  try {
+    const data = await Bootcamp.create(req.body);
+    res.json({ error: null, success: true, data });
+  } catch (e) {
+    res
+      .status(400)
+      .json({ error: "Provided data is not correct", success: false });
+  }
+};
 
 /*
  * @description:   Delete one bootcamp

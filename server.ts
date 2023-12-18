@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
+import bodyParser from "body-parser";
 import "@colors/colors";
 
 dotenv.config({ path: "./config/.env" });
@@ -17,6 +18,8 @@ const main = async () => {
 
   process.env.NODE_ENV === "development" && app.use(morgan("dev"));
 
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
   app.use(router);
 
   const server = app.listen(PORT, () =>
