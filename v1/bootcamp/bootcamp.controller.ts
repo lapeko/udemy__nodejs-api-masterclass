@@ -10,12 +10,9 @@ import { Bootcamp } from "./bootcamp.model";
 export const getBootcamps: RequestHandler = async (req, res) => {
   try {
     const data = await Bootcamp.find();
-    res.json({ error: null, success: true, data });
+    res.json({ success: true, data });
   } catch (e) {
-    res.status(500).json({
-      error: "Unexpected error occurred when request all bootcamps",
-      success: false,
-    });
+    res.status(500).json({ success: false });
   }
 };
 
@@ -27,12 +24,10 @@ export const getBootcamps: RequestHandler = async (req, res) => {
 export const getBootcamp: RequestHandler = async (req, res) => {
   try {
     const data = await Bootcamp.findById(req.params.id);
-    res.json({ error: null, success: true, data });
+    if (!data) return res.status(404).json({ success: false });
+    res.json({ success: true, data });
   } catch (e) {
-    res.status(500).json({
-      error: "Unexpected error occurred when request bootcamp",
-      success: false,
-    });
+    res.status(500).json({ success: false });
   }
 };
 
@@ -44,11 +39,9 @@ export const getBootcamp: RequestHandler = async (req, res) => {
 export const insertBootcamp: RequestHandler = async (req, res) => {
   try {
     const data = await Bootcamp.create(req.body);
-    res.json({ error: null, success: true, data });
+    res.json({ success: true, data });
   } catch (e) {
-    res
-      .status(400)
-      .json({ error: "Provided data is not correct", success: false });
+    res.status(400).json({ success: false });
   }
 };
 
@@ -57,8 +50,15 @@ export const insertBootcamp: RequestHandler = async (req, res) => {
  * @path:          "/api/v1/bootcamp/:id"
  * @method:        DELETE
  */
-export const deleteBootcamp: RequestHandler = (req, res) => {
-  res.json({ error: null, success: true });
+export const deleteBootcamp: RequestHandler = async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const result = await Bootcamp.deleteOne({ _id: req.params.id });
+    if (!result.deletedCount) return res.status(404).json({ success: false });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false });
+  }
 };
 
 /*
@@ -66,8 +66,18 @@ export const deleteBootcamp: RequestHandler = (req, res) => {
  * @path:          "/api/v1/bootcamp/:id"
  * @method:        PUT
  */
-export const putBootcamp: RequestHandler = (req, res) => {
-  res.json({ error: null, success: true });
+export const putBootcamp: RequestHandler = async (req, res) => {
+  try {
+    const options = { upsert: true, new: true, runValidators: true };
+    const data = await Bootcamp.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      options
+    );
+    res.json({ success: true, data: data });
+  } catch (e) {
+    res.status(500).json({ success: false });
+  }
 };
 
 /*
@@ -75,6 +85,17 @@ export const putBootcamp: RequestHandler = (req, res) => {
  * @path:          "/api/v1/bootcamp"
  * @method:        PATCH
  */
-export const patchBootcamp: RequestHandler = (req, res) => {
-  res.json({ error: null, success: true });
+export const patchBootcamp: RequestHandler = async (req, res) => {
+  try {
+    const options = { new: true, runValidators: true };
+    const data = await Bootcamp.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      options
+    );
+    if (!data) return res.status(404).json({ success: false });
+    res.json({ success: true, data: data });
+  } catch (e) {
+    res.status(500).json({ success: false });
+  }
 };
