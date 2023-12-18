@@ -26,7 +26,7 @@ export const getBootcamps: RequestHandler = async (req, res) => {
  */
 export const getBootcamp: RequestHandler = async (req, res) => {
   try {
-    const data = await Bootcamp.findById(req.body.id);
+    const data = await Bootcamp.findById(req.params.id);
     res.json({ error: null, success: true, data });
   } catch (e) {
     res.status(500).json({
@@ -57,21 +57,24 @@ export const insertBootcamp: RequestHandler = async (req, res) => {
  * @path:          "/api/v1/bootcamp/:id"
  * @method:        DELETE
  */
-export const deleteBootcamp: RequestHandler = (req, res) =>
+export const deleteBootcamp: RequestHandler = (req, res) => {
   res.json({ error: null, success: true });
+};
 
 /*
  * @description:   Insert a bootcamp or replace if exist
  * @path:          "/api/v1/bootcamp/:id"
  * @method:        PUT
  */
-export const putBootcamp: RequestHandler = (req, res) =>
+export const putBootcamp: RequestHandler = (req, res) => {
   res.json({ error: null, success: true });
+};
 
 /*
  * @description:   Update bootcamp's field(s)
  * @path:          "/api/v1/bootcamp"
  * @method:        PATCH
  */
-export const patchBootcamp: RequestHandler = (req, res) =>
+export const patchBootcamp: RequestHandler = (req, res) => {
   res.json({ error: null, success: true });
+};
