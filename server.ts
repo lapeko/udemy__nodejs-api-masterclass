@@ -1,33 +1,38 @@
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
-import "colors";
+import "@colors/colors";
 
 dotenv.config({ path: "./config/.env" });
 
 import { router } from "./router";
 import { connect } from "./config/db";
 
-connect();
-
 const PORT = process.env.PORT || 3000;
 
-const app = express();
+const main = async () => {
+  await connect();
 
-process.env.NODE_ENV === "development" && app.use(morgan("dev"));
+  const app = express();
 
-app.use(router);
+  process.env.NODE_ENV === "development" && app.use(morgan("dev"));
 
-const server = app.listen(PORT, () =>
-  console.log(
-    `Server running on port ${PORT} in mode ${process.env.NODE_ENV}`.green.bold
-  )
-);
+  app.use(router);
 
-process.on("unhandledRejection", (error) => {
-  if (error instanceof Error) console.error(error.message.red.bold);
-  else if (typeof error === "string") console.error(error);
-  else throw error;
+  const server = app.listen(PORT, () =>
+    console.log(
+      `Server running on port ${PORT} in mode ${process.env.NODE_ENV}`.green
+        .bold
+    )
+  );
 
-  server.close(() => process.exit(1));
-});
+  process.on("unhandledRejection", (error) => {
+    if (error instanceof Error) console.error(error.message.red.bold);
+    else if (typeof error === "string") console.error(error);
+    else throw error;
+
+    server.close(() => process.exit(1));
+  });
+};
+
+main();
