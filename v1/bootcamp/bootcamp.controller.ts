@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 
 import { Bootcamp } from "./bootcamp.model";
+import { ErrorResponse } from "../../utils/error-response";
 
 /*
  * @description:   Get all bootcamps
@@ -12,7 +13,7 @@ export const getBootcamps: RequestHandler = async (req, res, next) => {
     const data = await Bootcamp.find();
     res.json({ success: true, data });
   } catch (e) {
-    next(e);
+    next(new ErrorResponse());
   }
 };
 
@@ -24,10 +25,14 @@ export const getBootcamps: RequestHandler = async (req, res, next) => {
 export const getBootcamp: RequestHandler = async (req, res, next) => {
   try {
     const data = await Bootcamp.findById(req.params.id);
-    if (!data) return res.status(404).json({ success: false });
+    if (!data) {
+      next(
+        new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`)
+      );
+    }
     res.json({ success: true, data });
   } catch (e) {
-    next(e);
+    next(new ErrorResponse());
   }
 };
 
@@ -41,7 +46,7 @@ export const insertBootcamp: RequestHandler = async (req, res, next) => {
     const data = await Bootcamp.create(req.body);
     res.json({ success: true, data });
   } catch (e) {
-    next(e);
+    next(new ErrorResponse());
   }
 };
 
@@ -52,12 +57,14 @@ export const insertBootcamp: RequestHandler = async (req, res, next) => {
  */
 export const deleteBootcamp: RequestHandler = async (req, res, next) => {
   try {
-    console.log(req.params.id);
     const result = await Bootcamp.deleteOne({ _id: req.params.id });
-    if (!result.deletedCount) return res.status(404).json({ success: false });
+    if (!result.deletedCount)
+      next(
+        new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`)
+      );
     res.json({ success: true });
   } catch (e) {
-    next(e);
+    next(new ErrorResponse());
   }
 };
 
@@ -76,7 +83,7 @@ export const putBootcamp: RequestHandler = async (req, res, next) => {
     );
     res.json({ success: true, data: data });
   } catch (e) {
-    next(e);
+    next(new ErrorResponse());
   }
 };
 
@@ -93,9 +100,12 @@ export const patchBootcamp: RequestHandler = async (req, res, next) => {
       req.body,
       options
     );
-    if (!data) return res.status(404).json({ success: false });
+    if (!data)
+      next(
+        new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`)
+      );
     res.json({ success: true, data: data });
   } catch (e) {
-    next(e);
+    next(new ErrorResponse());
   }
 };
