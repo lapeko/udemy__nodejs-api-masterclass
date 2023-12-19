@@ -8,6 +8,7 @@ dotenv.config({ path: "./config/.env" });
 
 import { router } from "./router";
 import { connect } from "./config/db";
+import { errorHandlerMiddleware } from "./middleware/error-handler";
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,6 +22,7 @@ const main = async () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   app.use(router);
+  app.use(errorHandlerMiddleware);
 
   const server = app.listen(PORT, () =>
     console.log(
