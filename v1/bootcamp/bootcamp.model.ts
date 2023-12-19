@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const locationSchema = new mongoose.Schema({
   type: {
@@ -80,6 +81,11 @@ const bootcampSchema = new mongoose.Schema({
     type: String,
     default: "no-photo.jpg",
   },
+});
+
+bootcampSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
 
 export const Bootcamp = mongoose.model("Bootcamp", bootcampSchema);
