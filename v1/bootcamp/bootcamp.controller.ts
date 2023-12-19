@@ -13,7 +13,7 @@ export const getBootcamps: RequestHandler = async (req, res, next) => {
     const data = await Bootcamp.find();
     res.json({ success: true, data });
   } catch (e) {
-    next(new ErrorResponse());
+    next(e);
   }
 };
 
@@ -25,14 +25,14 @@ export const getBootcamps: RequestHandler = async (req, res, next) => {
 export const getBootcamp: RequestHandler = async (req, res, next) => {
   try {
     const data = await Bootcamp.findById(req.params.id);
-    if (!data) {
-      next(
-        new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`)
+    if (!data)
+      throw new ErrorResponse(
+        404,
+        `Bootcamp with id ${req.params.id} not found`
       );
-    }
     res.json({ success: true, data });
   } catch (e) {
-    next(new ErrorResponse());
+    next(e);
   }
 };
 
@@ -46,7 +46,7 @@ export const insertBootcamp: RequestHandler = async (req, res, next) => {
     const data = await Bootcamp.create(req.body);
     res.json({ success: true, data });
   } catch (e) {
-    next(new ErrorResponse());
+    next(e);
   }
 };
 
@@ -59,12 +59,13 @@ export const deleteBootcamp: RequestHandler = async (req, res, next) => {
   try {
     const result = await Bootcamp.deleteOne({ _id: req.params.id });
     if (!result.deletedCount)
-      next(
-        new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`)
+      throw new ErrorResponse(
+        404,
+        `Bootcamp with id ${req.params.id} not found`
       );
     res.json({ success: true });
   } catch (e) {
-    next(new ErrorResponse());
+    next(e);
   }
 };
 
@@ -83,7 +84,7 @@ export const putBootcamp: RequestHandler = async (req, res, next) => {
     );
     res.json({ success: true, data: data });
   } catch (e) {
-    next(new ErrorResponse());
+    next(e);
   }
 };
 
@@ -101,11 +102,12 @@ export const patchBootcamp: RequestHandler = async (req, res, next) => {
       options
     );
     if (!data)
-      next(
-        new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`)
+      throw new ErrorResponse(
+        404,
+        `Bootcamp with id ${req.params.id} not found`
       );
     res.json({ success: true, data: data });
   } catch (e) {
-    next(new ErrorResponse());
+    next(e);
   }
 };
