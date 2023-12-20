@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
 
+import { ErrorResponse } from "./../../utils/error-response";
+import { geocoder } from "../../utils/geocoder";
+
 const locationSchema = new mongoose.Schema({
   type: {
     type: String,
@@ -8,7 +11,7 @@ const locationSchema = new mongoose.Schema({
     required: true,
   },
   coordinates: {
-    type: [Number],
+    type: [Number, undefined],
     required: true,
     index: "2dsphere",
   },
@@ -54,7 +57,6 @@ const bootcampSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: [true, "Please add an address"],
   },
   location: {
     type: locationSchema,
@@ -85,6 +87,26 @@ const bootcampSchema = new mongoose.Schema({
 
 bootcampSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+bootcampSchema.pre("save", async function (next) {
+  if (!this.address) throw new ErrorResponse(400, "Address was not provided");
+
+  const [location] = await geocoder.geocode(this.address);
+
+  this.location = {
+    type: "Point",
+    coordinates: [location.latitude, location.longitude],
+    formattedAddress: location.formattedAddress,
+    street: location.streetName,
+    city: location.city,
+    state: location.stateCode,
+    zipcode: location.zipcode,
+    country: location.countryCode,
+  };
+
+  this.address = undefined;
   next();
 });
 
