@@ -1,7 +1,9 @@
 {
   "scripts": {
     "start": "NODE_ENV=production ts-node ./server.ts",
-    "dev": "ts-node-dev ./server.ts"
+    "dev": "ts-node-dev ./server.ts",
+    "seedDb": "ts-node ./seeder.ts -i",
+    "cleanDb": "ts-node ./seeder.ts -d"
   },
   "dependencies": {
     "@colors/colors": "^1.6.0",

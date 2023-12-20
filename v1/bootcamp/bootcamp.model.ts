@@ -12,8 +12,8 @@ const locationSchema = new mongoose.Schema({
   },
   coordinates: {
     type: [Number, undefined],
-    required: true,
     index: "2dsphere",
+    required: true,
   },
   formattedAddress: String,
   street: String,
@@ -58,9 +58,7 @@ const bootcampSchema = new mongoose.Schema({
   address: {
     type: String,
   },
-  location: {
-    type: locationSchema,
-  },
+  location: locationSchema,
   careers: {
     type: [String],
     required: true,
