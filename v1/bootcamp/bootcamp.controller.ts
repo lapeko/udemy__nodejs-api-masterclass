@@ -3,16 +3,40 @@ import { RequestHandler } from "express";
 import { Bootcamp } from "./bootcamp.model";
 import { ErrorResponse } from "../../utils/error-response";
 import { asyncHandler } from "../../utils/async-handler";
+import { geocoder } from "../../utils/geocoder";
 
 /*
  * @description:   Get all bootcamps
  * @path:          "/api/v1/bootcamp"
  * @method:        GET
  */
-export const getBootcamps: RequestHandler = asyncHandler(async (_, res) => {
-  const data = await Bootcamp.find();
+export const getBootcamps: RequestHandler = asyncHandler(async (req, res) => {
+  const data = await Bootcamp.find(req.query);
   res.json({ success: true, data });
 });
+
+/*
+ * @description:   Get all bootcamps in radius
+ * @path:          "/api/v1/bootcamp/radius/:zipcode/:radius"
+ * @method:        GET
+ */
+export const getBootcampsByZipCodeAndDistance: RequestHandler = asyncHandler(
+  async (req, res) => {
+    const { zipcode, radius } = req.params;
+
+    const [location] = await geocoder.geocode({ zipcode });
+    const radians = +radius / 6378.1;
+
+    const data = await Bootcamp.find({
+      location: {
+        $geoWithin: {
+          $centerSphere: [[location.latitude, location.longitude], radians],
+        },
+      },
+    });
+    res.json({ success: true, data });
+  }
+);
 
 /*
  * @description:   Get one bootcamp
