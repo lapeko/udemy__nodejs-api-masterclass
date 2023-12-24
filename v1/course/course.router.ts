@@ -1,8 +1,12 @@
 import { Router } from "express";
 
-import { getAllCourses } from "./course.controller";
+import {
+  getAllCourses,
+  getCourseById,
+  createCourseByBootcampId,
+} from "./course.controller";
 
 export const courseRouter = Router({ mergeParams: true });
 
-courseRouter.route("/").get(getAllCourses);
-courseRouter.route("/:bootcampId").get(getAllCourses);
+courseRouter.route("/").get(getAllCourses).post(createCourseByBootcampId);
+courseRouter.route("/:id").get(getCourseById);
