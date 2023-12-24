@@ -3,7 +3,8 @@
     "start": "NODE_ENV=production ts-node ./server.ts",
     "dev": "ts-node-dev ./server.ts",
     "seedDb": "ts-node ./seeder.ts -i",
-    "cleanDb": "ts-node ./seeder.ts -d"
+    "cleanDb": "ts-node ./seeder.ts -d",
+    "refreshDb": "npm run cleanDb && npm run seedDb"
   },
   "dependencies": {
     "@colors/colors": "^1.6.0",

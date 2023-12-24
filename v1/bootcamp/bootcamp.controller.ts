@@ -48,7 +48,10 @@ export const getBootcamps: RequestHandler = asyncHandler(async (req, res) => {
       pagination.next = { page: page + 1, limit };
   }
 
-  const data = await request;
+  const data = await request.populate({
+    path: "courses",
+    select: "title description",
+  });
 
   res.json({ success: true, data, count, pagination });
 });

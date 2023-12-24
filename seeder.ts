@@ -22,6 +22,7 @@ const seedDb = async () => {
 const cleanDb = async () => {
   await connect();
   await Bootcamp.deleteMany();
+  await Course.deleteMany();
   console.log("Bootcamps successfully deleted from DB".red.inverse);
   process.exit(0);
 };
