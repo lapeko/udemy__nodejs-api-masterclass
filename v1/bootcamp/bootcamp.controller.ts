@@ -140,7 +140,9 @@ export const patchBootcamp: RequestHandler = asyncHandler(async (req, res) => {
     req.body,
     options
   );
+
   if (!data)
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
+
   res.json({ success: true, data: data });
 });

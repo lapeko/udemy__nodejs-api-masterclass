@@ -63,3 +63,49 @@ export const createCourseByBootcampId: RequestHandler = asyncHandler(
     res.json({ success: true, data });
   }
 );
+
+/*
+ * @description:   Put course
+ * @path:         "/api/v1/bootcamp/:id"
+ * @method:        PUT
+ * private
+ */
+export const putCourse: RequestHandler = asyncHandler(async (req, res) => {
+  const options = { upsert: true, new: true, runValidators: true };
+
+  const data = await Course.findByIdAndUpdate(req.params.id, req.body, options);
+
+  res.json({ success: true, data });
+});
+
+/*
+ * @description:   Patch a course
+ * @path:         "/api/v1/bootcamp/:id"
+ * @method:        PATCH
+ * private
+ */
+export const patchCourse: RequestHandler = asyncHandler(async (req, res) => {
+  const options = { new: true, runValidators: true };
+
+  const data = await Course.findByIdAndUpdate(req.params.id, req.body, options);
+
+  if (!data)
+    throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
+
+  res.json({ success: true, data });
+});
+
+/*
+ * @description:   Delete a course
+ * @path:         "/api/v1/bootcamp/:id"
+ * @method:        DELETE
+ * private
+ */
+export const deleteCourse: RequestHandler = asyncHandler(async (req, res) => {
+  const result = await Course.findByIdAndDelete(req.params.id);
+
+  if (!result)
+    throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
+
+  res.json({ success: true });
+});
