@@ -7,21 +7,14 @@ dotenv.config({ path: "./config/.env" });
 
 import { connect } from "./config/db";
 import { Bootcamp } from "./v1/bootcamp/bootcamp.model";
+import { Course } from "./v1/course/course.model";
 
 const seedDb = async () => {
   await connect();
-  const bootcamps = JSON.parse(
-    readFileSync(
-      path.join(
-        __dirname,
-        "devcamper_project_resources",
-        "_data",
-        "bootcamps.json"
-      ),
-      "utf-8"
-    )
-  );
+  const bootcamps = readMockFromFileSync("bootcamps");
+  const courses = readMockFromFileSync("courses");
   await Bootcamp.create(bootcamps);
+  await Course.create(courses);
   console.log("Bootcamps successfully inserted into DB".green.inverse);
   process.exit(0);
 };
@@ -38,4 +31,17 @@ else if (process.argv[2] == "-d") cleanDb();
 else
   console.log(
     'PLease, provide a flag either "-i" to seed DB or "-d" to clean db. E.g. "npx ts-node ./seeder.ts -i"'
+  );
+
+const readMockFromFileSync = (fileName: string) =>
+  JSON.parse(
+    readFileSync(
+      path.join(
+        __dirname,
+        "devcamper_project_resources",
+        "_data",
+        `${fileName}.json`
+      ),
+      "utf-8"
+    )
   );
