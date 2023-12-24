@@ -32,9 +32,9 @@ export const getBootcamps: RequestHandler = asyncHandler(async (req, res) => {
   request.skip(skip);
   request.limit(limit);
 
-  const data = await request;
+  const [data, count] = await Promise.all([request, Bootcamp.countDocuments()]);
 
-  res.json({ success: true, data });
+  res.json({ success: true, data, count });
 });
 
 /*
