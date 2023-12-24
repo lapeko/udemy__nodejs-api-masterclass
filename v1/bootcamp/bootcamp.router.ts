@@ -9,16 +9,21 @@ import {
   patchBootcamp,
   getBootcampsByZipCodeAndDistance,
 } from "./bootcamp.controller";
+import { courseRouter } from "../course/course.router";
 
-export const router = Router();
+export const bootcampRouter = Router();
 
-router.route("/").get(getBootcamps).post(insertBootcamp);
+bootcampRouter.use("/:bootcampId/courses", courseRouter);
 
-router
+bootcampRouter.route("/").get(getBootcamps).post(insertBootcamp);
+
+bootcampRouter
   .route("/:id")
   .get(getBootcamp)
   .delete(deleteBootcamp)
   .put(putBootcamp)
   .patch(patchBootcamp);
 
-router.route("/radius/:zipcode/:radius").get(getBootcampsByZipCodeAndDistance);
+bootcampRouter
+  .route("/radius/:zipcode/:radius")
+  .get(getBootcampsByZipCodeAndDistance);
