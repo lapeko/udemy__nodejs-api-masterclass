@@ -11,7 +11,28 @@ import { geocoder } from "../../utils/geocoder";
  * @method:        GET
  */
 export const getBootcamps: RequestHandler = asyncHandler(async (req, res) => {
-  const data = await Bootcamp.find(req.query);
+  const deleteKeys = ["select", "sort", "skip", "limit"];
+
+  const query = { ...req.query };
+  deleteKeys.forEach((key) => {
+    delete query[key];
+  });
+
+  const select = (req.query.select as string | undefined)?.replace(",", " ");
+  const sort = req.query.sort
+    ? JSON.parse(req.query.sort as string)
+    : "-createdAt";
+  const skip = req.query.skip ? parseInt(req.query.skip as string) : 0;
+  const limit = req.query.limit ? parseInt(req.query.limit as string) : 0;
+
+  const request = Bootcamp.find(query);
+  select && request.select(select);
+  request.sort(sort);
+  request.skip(skip);
+  request.limit(limit);
+
+  const data = await request;
+
   res.json({ success: true, data });
 });
 
