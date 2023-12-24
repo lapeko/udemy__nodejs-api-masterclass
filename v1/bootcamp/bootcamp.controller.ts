@@ -18,12 +18,17 @@ export const getBootcamps: RequestHandler = asyncHandler(async (req, res) => {
     delete query[key];
   });
 
+  const count = await Bootcamp.countDocuments();
+  const page = req.query.page ? parseInt(req.query.page as string) : 1;
+  const limit = req.query.limit ? parseInt(req.query.limit as string) : 0;
+
+  if (page < 1 || page > Math.ceil(count / limit))
+    throw new ErrorResponse(400, "Pagination page validation error");
+
   const select = (req.query.select as string | undefined)?.replace(",", " ");
   const sort = req.query.sort
     ? JSON.parse(req.query.sort as string)
     : "-createdAt";
-  const page = req.query.page ? parseInt(req.query.page as string) : 1;
-  const limit = req.query.limit ? parseInt(req.query.limit as string) : 0;
   const skip = (page - 1) * limit;
 
   const request = Bootcamp.find(query);
@@ -32,9 +37,20 @@ export const getBootcamps: RequestHandler = asyncHandler(async (req, res) => {
   request.skip(skip);
   request.limit(limit);
 
-  const [data, count] = await Promise.all([request, Bootcamp.countDocuments()]);
+  const pagination: {
+    previous?: { page: number; limit: number };
+    next?: { page: number; limit: number };
+  } = {};
 
-  res.json({ success: true, data, count });
+  if (limit < count) {
+    if (page > 1) pagination.previous = { page: page - 1, limit };
+    if (page < Math.ceil(count / limit))
+      pagination.next = { page: page + 1, limit };
+  }
+
+  const data = await request;
+
+  res.json({ success: true, data, count, pagination });
 });
 
 /*
