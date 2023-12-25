@@ -98,6 +98,8 @@ bootcampSchema.pre("save", function (next) {
 });
 
 bootcampSchema.pre("save", async function (next) {
+  if (this.location) next();
+
   if (!this.address) throw new ErrorResponse(400, "Address was not provided");
 
   const [location] = await geocoder.geocode(this.address);

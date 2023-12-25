@@ -14,7 +14,8 @@ const seedDb = async () => {
   const bootcamps = readMockFromFileSync("bootcamps");
   const courses = readMockFromFileSync("courses");
   await Bootcamp.create(bootcamps);
-  await Course.create(courses);
+  for (const bootcamp of bootcamps) await Course.create(bootcamp);
+  for (const course of courses) await Course.create(course);
   console.log("Bootcamps successfully inserted into DB".green.inverse);
   process.exit(0);
 };

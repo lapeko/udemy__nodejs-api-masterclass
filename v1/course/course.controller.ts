@@ -11,7 +11,6 @@ import { Bootcamp } from "../bootcamp/bootcamp.model";
  * @method:        GET
  */
 export const getAllCourses: RequestHandler = asyncHandler(async (req, res) => {
-  console.log(req.params);
   const request = req.params.bootcampId
     ? Course.find({ bootcamp: req.params.bootcampId })
     : Course.find();
@@ -58,25 +57,11 @@ export const createCourseByBootcampId: RequestHandler = asyncHandler(
     if (!body.bootcamp)
       throw new Error(`Bootcamp with ID ${bootcampId} not found`);
 
-    const data = await Course.create(body);
+    const data = await new Course(body).save();
 
     res.json({ success: true, data });
   }
 );
-
-/*
- * @description:   Put course
- * @path:         "/api/v1/bootcamp/:id"
- * @method:        PUT
- * private
- */
-export const putCourse: RequestHandler = asyncHandler(async (req, res) => {
-  const options = { upsert: true, new: true, runValidators: true };
-
-  const data = await Course.findByIdAndUpdate(req.params.id, req.body, options);
-
-  res.json({ success: true, data });
-});
 
 /*
  * @description:   Patch a course
@@ -85,12 +70,13 @@ export const putCourse: RequestHandler = asyncHandler(async (req, res) => {
  * private
  */
 export const patchCourse: RequestHandler = asyncHandler(async (req, res) => {
-  const options = { new: true, runValidators: true };
+  let course = await Course.findById(req.params.id);
 
-  const data = await Course.findByIdAndUpdate(req.params.id, req.body, options);
+  if (course) Object.assign(course, req.body);
+  else
+    throw new ErrorResponse(404, `Course with id ${req.params.id} not found`);
 
-  if (!data)
-    throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
+  const data = await course.save();
 
   res.json({ success: true, data });
 });
@@ -102,10 +88,12 @@ export const patchCourse: RequestHandler = asyncHandler(async (req, res) => {
  * private
  */
 export const deleteCourse: RequestHandler = asyncHandler(async (req, res) => {
-  const result = await Course.findByIdAndDelete(req.params.id);
+  const result = await Course.findById(req.params.id);
 
   if (!result)
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
+
+  await Course.deleteOne({ _id: result._id });
 
   res.json({ success: true });
 });

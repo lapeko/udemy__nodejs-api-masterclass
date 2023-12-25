@@ -4,7 +4,6 @@ import {
   getAllCourses,
   getCourseById,
   createCourseByBootcampId,
-  putCourse,
   patchCourse,
   deleteCourse,
 } from "./course.controller";
@@ -15,6 +14,5 @@ courseRouter.route("/").get(getAllCourses).post(createCourseByBootcampId);
 courseRouter
   .route("/:id")
   .get(getCourseById)
-  .put(putCourse)
   .patch(patchCourse)
   .delete(deleteCourse);
