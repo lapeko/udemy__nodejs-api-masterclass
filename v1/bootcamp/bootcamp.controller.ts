@@ -107,8 +107,8 @@ export const insertBootcamp: RequestHandler = asyncHandler(async (req, res) => {
  * @method:        DELETE
  */
 export const deleteBootcamp: RequestHandler = asyncHandler(async (req, res) => {
-  const result = await Bootcamp.deleteOne({ _id: req.params.id });
-  if (!result.deletedCount)
+  const result = await Bootcamp.findByIdAndDelete(req.params.id);
+  if (!result)
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
   res.json({ success: true });
 });

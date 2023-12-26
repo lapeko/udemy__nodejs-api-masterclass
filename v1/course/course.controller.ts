@@ -88,12 +88,10 @@ export const patchCourse: RequestHandler = asyncHandler(async (req, res) => {
  * private
  */
 export const deleteCourse: RequestHandler = asyncHandler(async (req, res) => {
-  const result = await Course.findById(req.params.id);
+  const result = await Course.findByIdAndDelete(req.params.id);
 
   if (!result)
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
-
-  await Course.deleteOne({ _id: result._id });
 
   res.json({ success: true });
 });

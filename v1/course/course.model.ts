@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Bootcamp } from "../bootcamp/bootcamp.model";
+import { ErrorResponse } from "../../utils/error-response";
 
 interface ICourseDocument extends mongoose.Document {
   title: string;
@@ -60,14 +61,22 @@ const courseSchema = new mongoose.Schema(
 courseSchema.static(
   "updateAverageCost",
   async function (bootcampId: mongoose.Types.ObjectId | null | undefined) {
-    const [{ averageCost }] = await Course.aggregate([
+    console.log("bootcampId", bootcampId);
+    const [response] = await Course.aggregate([
       { $match: { bootcamp: bootcampId } },
       { $group: { _id: "$bootcamp", averageCost: { $avg: "$tuition" } } },
     ]);
+
+    if (!response)
+      throw new ErrorResponse(
+        500,
+        `Bootcamp aggregation error. Bootcamp with ID ${bootcampId} not found`
+      );
+
     const bootcamp = await Bootcamp.findOne({ _id: bootcampId });
     if (bootcamp) {
       Object.assign(bootcamp, {
-        averageCost: Math.ceil(averageCost / 10) * 10,
+        averageCost: Math.ceil(response.averageCost / 10) * 10,
       });
       await bootcamp.save();
     }
@@ -77,10 +86,8 @@ courseSchema.static(
 courseSchema.post("save", async function () {
   Course.updateAverageCost(this.bootcamp);
 });
-courseSchema.post("deleteOne", async function () {
-  console.log((this as any)._conditions);
-  // console.log(arguments);
-  // Course.updateAverageCost(this);
+courseSchema.post("findOneAndDelete", async function (doc) {
+  Course.updateAverageCost(doc.bootcamp._id);
 });
 
 export const Course = mongoose.model<ICourseDocument, ICourseModel>(
