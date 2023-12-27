@@ -1,8 +1,10 @@
-import NodeGeocoder, { Options } from "node-geocoder";
+import NodeGeocoder, {Options} from "node-geocoder";
+
+import {EnvVariable, getEnvVariable} from "./get-env-variable";
 
 const options: Options = {
   provider: "mapquest",
-  apiKey: process.env.GEOCODER_API_KEY,
+  apiKey: getEnvVariable(EnvVariable.GEOCODER_API_KEY),
 };
 
 export const geocoder = NodeGeocoder(options);

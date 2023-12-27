@@ -1,6 +1,7 @@
-import { ErrorRequestHandler } from "express";
+import {ErrorRequestHandler} from "express";
+import {MulterError} from "multer";
 
-import { ErrorResponse } from "../utils/error-response";
+import {ErrorResponse} from "../utils/error-response";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = (
   err,
@@ -8,9 +9,11 @@ export const errorHandlerMiddleware: ErrorRequestHandler = (
   res,
   next
 ) => {
-  console.error(err.red);
+  console.error(err);
 
   let error: ErrorResponse = new ErrorResponse();
+
+  if (err instanceof Error) error.message = err.message;
 
   if (err instanceof ErrorResponse) error = err;
   else if (err.name === "CastError")
@@ -30,6 +33,9 @@ export const errorHandlerMiddleware: ErrorRequestHandler = (
         .map(([key, value]) => `"${key}": "${value}"`)
         .join(", ")}`
     );
+  } else if (err instanceof MulterError) {
+    error.statusCode = 400;
+    error.message = `File upload error: ${err.message}`;
   }
 
   res.status(error.statusCode).json({ success: false, error: error.message });

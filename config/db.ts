@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
-
-const mongoUrl = process.env.MONGO_URL;
+import {EnvVariable, getEnvVariable} from "../utils/get-env-variable";
 
 export const connect = async () => {
-  if (!mongoUrl) throw new Error("mongoUrl not provided");
-  const connection = await mongoose.connect(mongoUrl);
+  const connection = await mongoose.connect(getEnvVariable(EnvVariable.MONGO_URL));
   console.log(
     `Mongo DB connected. Connection host: ${connection.connection.host}`.cyan
       .underline

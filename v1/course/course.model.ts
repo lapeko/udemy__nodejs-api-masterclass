@@ -61,7 +61,6 @@ const courseSchema = new mongoose.Schema(
 courseSchema.static(
   "updateAverageCost",
   async function (bootcampId: mongoose.Types.ObjectId | null | undefined) {
-    console.log("bootcampId", bootcampId);
     const [response] = await Course.aggregate([
       { $match: { bootcamp: bootcampId } },
       { $group: { _id: "$bootcamp", averageCost: { $avg: "$tuition" } } },
@@ -75,9 +74,7 @@ courseSchema.static(
 
     const bootcamp = await Bootcamp.findOne({ _id: bootcampId });
     if (bootcamp) {
-      Object.assign(bootcamp, {
-        averageCost: Math.ceil(response.averageCost / 10) * 10,
-      });
+      Object.assign(bootcamp, {averageCost: Math.ceil(response.averageCost / 10) * 10});
       await bootcamp.save();
     }
   }

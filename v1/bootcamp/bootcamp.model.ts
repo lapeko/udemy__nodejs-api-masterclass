@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
 
-import { ErrorResponse } from "./../../utils/error-response";
+import { ErrorResponse } from "../../utils/error-response";
 import { geocoder } from "../../utils/geocoder";
 
 const locationSchema = new mongoose.Schema({
