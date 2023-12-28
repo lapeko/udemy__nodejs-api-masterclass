@@ -1,7 +1,8 @@
-import express, {NextFunction, Request, Response} from "express";
+import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import "@colors/colors";
 
 dotenv.config({ path: "./config/.env" });
@@ -23,6 +24,7 @@ const main = async () => {
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
+  app.use(cookieParser());
   app.use(router);
   app.use(errorHandlerMiddleware);
 

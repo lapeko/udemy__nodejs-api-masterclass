@@ -8,7 +8,7 @@ import {EnvVariable, getEnvVariable} from "../../utils/get-env-variable";
 const jwtSecret = getEnvVariable(EnvVariable.JWT_SECRET_KEY);
 const jwtExpiresIn = getEnvVariable(EnvVariable.JWT_EXPIRE_IN);
 
-interface IUserDocument extends mongoose.Document {
+export interface IUserDocument extends mongoose.Document {
   name: string;
   email: string;
   role: string;
@@ -18,6 +18,7 @@ interface IUserDocument extends mongoose.Document {
   updatedAt: NativeDate;
   createdAt: NativeDate;
   getJwtToken: () => string;
+  checkPassword: (password: string) => Promise<boolean>;
 }
 
 const userSchema = new mongoose.Schema({
@@ -32,6 +33,7 @@ const userSchema = new mongoose.Schema({
       "PLease add a valid email",
     ],
     require: [true, "Please provide an email"],
+    unique: [true, "This email has already taken"],
   },
   role: {
     type: String,
@@ -59,6 +61,10 @@ userSchema.pre("save", async function(next) {
 
 userSchema.methods.getJwtToken = function() {
   return jsonwebtoken.sign({id: this._id}, jwtSecret, {expiresIn: jwtExpiresIn});
+};
+
+userSchema.methods.checkPassword = function(password: string): Promise<boolean> {
+  return bcrypt.compare(password, this.password);
 };
 
 export const User = mongoose.model<IUserDocument>("User", userSchema);

@@ -9,6 +9,7 @@ export enum EnvVariable {
   MAX_IMAGE_SIZE_KB="MAX_IMAGE_SIZE_KB",
   JWT_SECRET_KEY="JWT_SECRET_KEY",
   JWT_EXPIRE_IN="JWT_EXPIRE_IN_DAYS",
+  COOKIE_EXPIRE_IN_DAYS="COOKIE_EXPIRE_IN_DAYS",
 };
 
 export const getEnvVariable = (key: EnvVariable) => {
