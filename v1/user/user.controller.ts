@@ -1,6 +1,7 @@
 import {RequestHandler} from "express";
 
 import {asyncHandler} from "../../utils/async-handler";
+import {User} from "./user.model";
 
 /*
  * @description:   Register user
@@ -8,5 +9,6 @@ import {asyncHandler} from "../../utils/async-handler";
  * @method:        POST
  */
 export const createUser: RequestHandler = asyncHandler(async (req, res) => {
-  res.send("Ok");
+  const user = await User.create(req.body);
+  res.json(user);
 });

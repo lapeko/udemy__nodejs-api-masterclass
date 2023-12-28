@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import {ErrorResponse} from "../../utils/error-response";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -28,6 +30,13 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpire: Date,
 }, {
   timestamps: true,
+});
+
+userSchema.pre("save", async function(next) {
+  if (!this.password) throw new ErrorResponse(400, "Password not provided");
+
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
 
 export const User = mongoose.model("User", userSchema);
