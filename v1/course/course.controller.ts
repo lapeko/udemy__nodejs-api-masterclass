@@ -29,7 +29,6 @@ export const getAllCourses: RequestHandler = asyncHandler(async (req, res) => {
  * @method:        GET
  */
 export const getCourseById: RequestHandler = asyncHandler(async (req, res) => {
-  console.log(req.params);
   const data = await Course.findById(req.params.id).populate({
     path: "bootcamp",
     select: "name description",

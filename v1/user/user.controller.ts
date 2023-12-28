@@ -1,8 +1,11 @@
-import {RequestHandler, Response} from "express";
+import {CookieOptions, RequestHandler, Response} from "express";
 
 import {asyncHandler} from "../../utils/async-handler";
 import {IUserDocument, User} from "./user.model";
 import {ErrorResponse} from "../../utils/error-response";
+import {EnvVariable, getEnvVariable} from "../../utils/get-env-variable";
+
+const PRODUCTION_MODE = getEnvVariable(EnvVariable.NODE_ENV) === "production";
 
 /*
  * @description:   Register user
@@ -38,7 +41,25 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
   sendResWithToken(user, res);
 });
 
+/*
+ * @description:   Response with a user based on a token
+ * @path:          "/api/v1/user/whoami"
+ * @method:        GET
+ */
+export const whoAmI: RequestHandler = (req, res, next) => {
+  res.json({success: true, data: res.locals.user});
+};
+
 function sendResWithToken <T>(user: IUserDocument, res: Response): void {
   const token = user.getJwtToken();
-  res.json({success: true, token});
+
+  const options: CookieOptions = {
+    expires: new Date(Date.now() + +getEnvVariable(EnvVariable.COOKIE_EXPIRE_IN_DAYS) * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: PRODUCTION_MODE,
+  };
+
+  res
+    .cookie("token", token, options)
+    .json({success: true, data: token});
 }

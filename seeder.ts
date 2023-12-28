@@ -31,19 +31,7 @@ const cleanDb = async () => {
 if (process.argv[2] == "-i") seedDb();
 else if (process.argv[2] == "-d") cleanDb();
 else
-  console.log(
-    'PLease, provide a flag either "-i" to seed DB or "-d" to clean db. E.g. "npx ts-node ./seeder.ts -i"'
-  );
+  console.log('PLease, provide a flag either "-i" to seed DB or "-d" to clean db. E.g. "npx ts-node ./seeder.ts -i"');
 
 const readMockFromFileSync = (fileName: string) =>
-  JSON.parse(
-    readFileSync(
-      path.join(
-        __dirname,
-        "devcamper_project_resources",
-        "_data",
-        `${fileName}.json`
-      ),
-      "utf-8"
-    )
-  );
+  JSON.parse(readFileSync(path.join(__dirname, "devcamper_project_resources", "_data", `${fileName}.json`), "utf-8"));

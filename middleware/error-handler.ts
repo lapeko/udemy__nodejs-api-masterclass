@@ -9,7 +9,7 @@ export const errorHandlerMiddleware: ErrorRequestHandler = (
   res,
   next
 ) => {
-  console.error(err);
+  console.log(err);
 
   let error: ErrorResponse = new ErrorResponse();
 
