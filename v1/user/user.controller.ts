@@ -10,5 +10,6 @@ import {User} from "./user.model";
  */
 export const createUser: RequestHandler = asyncHandler(async (req, res) => {
   const user = await User.create(req.body);
-  res.json(user);
+  const token = user.getJwtToken();
+  res.json({success: true, token});
 });

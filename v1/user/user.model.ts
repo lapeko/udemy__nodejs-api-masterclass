@@ -1,6 +1,24 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jsonwebtoken from "jsonwebtoken";
+
 import {ErrorResponse} from "../../utils/error-response";
+import {EnvVariable, getEnvVariable} from "../../utils/get-env-variable";
+
+const jwtSecret = getEnvVariable(EnvVariable.JWT_SECRET_KEY);
+const jwtExpiresIn = getEnvVariable(EnvVariable.JWT_EXPIRE_IN);
+
+interface IUserDocument extends mongoose.Document {
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+  resetPasswordToken: string;
+  resetPasswordExpire: string;
+  updatedAt: NativeDate;
+  createdAt: NativeDate;
+  getJwtToken: () => string;
+}
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -39,4 +57,8 @@ userSchema.pre("save", async function(next) {
   next();
 });
 
-export const User = mongoose.model("User", userSchema);
+userSchema.methods.getJwtToken = function() {
+  return jsonwebtoken.sign({id: this._id}, jwtSecret, {expiresIn: jwtExpiresIn});
+};
+
+export const User = mongoose.model<IUserDocument>("User", userSchema);
