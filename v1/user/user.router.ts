@@ -7,4 +7,4 @@ export const userRouter =  Router();
 
 userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
-userRouter.get("/whoami", auth, whoAmI);
+userRouter.get("/whoami", auth(), whoAmI);

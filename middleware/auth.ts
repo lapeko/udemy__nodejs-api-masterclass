@@ -7,7 +7,7 @@ import {User} from "../v1/user/user.model";
 
 const secretKey = getEnvVariable(EnvVariable.JWT_SECRET_KEY);
 
-export const auth: RequestHandler = async (req, res, next) => {
+export const auth = (...roles: Array<"publisher" | "admin">): RequestHandler => async (req, res, next) => {
   let token = "";
   const authorization = req.headers.authorization as string;
 
@@ -18,20 +18,23 @@ export const auth: RequestHandler = async (req, res, next) => {
   };
 
   if (!token)
-    return next(new ErrorResponse(400, "Not authorized"));
+    return next(new ErrorResponse(401, "Not authorized"));
 
   if (!jsonWebToken.verify(token, secretKey))
-    return next(new ErrorResponse(400, "Not authorized"));
+    return next(new ErrorResponse(401, "Not authorized"));
 
   const {id} = jsonWebToken.decode(token) as {id: string} || {};
 
   if (!id)
-    return next(new ErrorResponse(400, "Not authorized"));
+    return next(new ErrorResponse(401, "Not authorized"));
 
   const user = await User.findById(id);
 
   if (!user)
-    return next(new ErrorResponse(400, "Not authorized"));
+    return next(new ErrorResponse(401, "Not authorized"));
+
+  if (roles.length && !(roles as string[]).includes(user.role))
+    return next(new ErrorResponse(401, "Not authorized"));
 
   res.locals.user = user;
   next();

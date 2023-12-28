@@ -25,16 +25,16 @@ bootcampRouter.use("/:bootcampId/courses", courseRouter);
 
 bootcampRouter.route("/")
   .get(advancedResults, getBootcamps)
-  .post(auth, insertBootcamp);
+  .post(auth("publisher", "admin"), insertBootcamp);
 
 bootcampRouter.route("/:id")
   .get(getBootcamp)
-  .delete(auth, deleteBootcamp)
-  .put(auth, putBootcamp)
-  .patch(auth, patchBootcamp);
+  .delete(auth("publisher", "admin"), deleteBootcamp)
+  .put(auth("publisher", "admin"), putBootcamp)
+  .patch(auth("publisher", "admin"), patchBootcamp);
 
 bootcampRouter.route("/:id/logo")
-  .post(auth, upload.single('file'), uploadLogo);
+  .post(auth("publisher", "admin"), upload.single('file'), uploadLogo);
 
 bootcampRouter.route("/radius/:zipcode/:radius")
   .get(getBootcampsByZipCodeAndDistance);

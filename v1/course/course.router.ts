@@ -14,10 +14,10 @@ export const courseRouter = Router({ mergeParams: true });
 courseRouter
   .route("/")
   .get(getAllCourses)
-  .post(auth, createCourseByBootcampId);
+  .post(auth("publisher", "admin"), createCourseByBootcampId);
 
 courseRouter
   .route("/:id")
   .get(getCourseById)
-  .patch(auth, patchCourse)
-  .delete(auth, deleteCourse);
+  .patch(auth("publisher", "admin"), patchCourse)
+  .delete(auth("publisher", "admin"), deleteCourse);
