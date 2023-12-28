@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 
-import { asyncHandler } from "./../../utils/async-handler";
+import { asyncHandler } from "../../utils/async-handler";
 import { Course } from "./course.model";
 import { ErrorResponse } from "../../utils/error-response";
 import { Bootcamp } from "../bootcamp/bootcamp.model";
