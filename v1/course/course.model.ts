@@ -9,7 +9,8 @@ interface ICourseDocument extends mongoose.Document {
   tuition: number;
   minimumSkill: string;
   scholarhipsAvailable: boolean;
-  bootcamp: mongoose.Types.ObjectId | null | undefined;
+  bootcamp: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   updatedAt: NativeDate;
   createdAt: NativeDate;
 }
@@ -53,14 +54,20 @@ const courseSchema = new mongoose.Schema(
     bootcamp: {
       type: mongoose.Schema.ObjectId,
       ref: "Bootcamp",
+      require: true,
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      require: true,
+    }
   },
   { timestamps: true }
 );
 
 courseSchema.static(
   "updateAverageCost",
-  async function (bootcampId: mongoose.Types.ObjectId | null | undefined) {
+  async function (bootcampId: mongoose.Types.ObjectId) {
     const [response] = await Course.aggregate([
       { $match: { bootcamp: bootcampId } },
       { $group: { _id: "$bootcamp", averageCost: { $avg: "$tuition" } } },
@@ -81,7 +88,7 @@ courseSchema.static(
 );
 
 courseSchema.post("save", async function () {
-  Course.updateAverageCost(this.bootcamp);
+  Course.updateAverageCost(this.bootcamp!._id);
 });
 courseSchema.post("findOneAndDelete", async function (doc) {
   Course.updateAverageCost(doc.bootcamp._id);

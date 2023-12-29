@@ -81,7 +81,7 @@ export const deleteBootcamp: RequestHandler = asyncHandler(async (req, res) => {
   if (!bootcampToDelete)
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
   if (bootcampToDelete.user.toString() !== res.locals.user._id.toString() && res.locals.role !== "admin")
-    throw new ErrorResponse(400, `User with ID ${res.locals.user._id} is not authorized to delete given bootcamp`);
+    throw new ErrorResponse(401, `User with ID ${res.locals.user._id} is not authorized to delete given bootcamp`);
   res.json({ success: true });
 });
 
@@ -97,7 +97,7 @@ export const patchBootcamp: RequestHandler = asyncHandler(async (req, res) => {
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
 
   if (bootcampToUpdate.user.toString() !== res.locals.user._id.toString() && res.locals.role !== "admin")
-    throw new ErrorResponse(400, `User with ID ${res.locals.user._id} is not authorized to update given bootcamp`);
+    throw new ErrorResponse(401, `User with ID ${res.locals.user._id} is not authorized to update given bootcamp`);
 
   const data = await bootcampToUpdate.updateOne(req.body, { new: true, runValidators: true });
 
@@ -117,7 +117,7 @@ export const uploadLogo: RequestHandler = asyncHandler(async (req, res) => {
 
   if (!bootcamp) throw new ErrorResponse(404, "Bootcamp with given ID does not exist");
   if (bootcamp.user.toString() !== res.locals.user._id.toString() && res.locals.role !== "admin")
-    throw new ErrorResponse(400, `User with ID ${res.locals.user._id} is not authorized to upload logo forgiven bootcamp`);
+    throw new ErrorResponse(401, `User with ID ${res.locals.user._id} is not authorized to upload logo forgiven bootcamp`);
   if (!file) throw new ErrorResponse(400, "Logo not provided");
   if (!file.mimetype.startsWith("image")) throw new ErrorResponse(400, "Provided logo file is not a picture");
   if (file.size > +getEnvVariable(EnvVariable.MAX_IMAGE_SIZE_KB) * 1024) throw new ErrorResponse(400, "Logo is too big");

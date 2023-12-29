@@ -52,9 +52,13 @@ export const createCourseByBootcampId: RequestHandler = asyncHandler(
     const body = { ...req.body };
 
     body.bootcamp = await Bootcamp.findById(bootcampId);
+    body.user = res.locals.user;
 
     if (!body.bootcamp)
       throw new Error(`Bootcamp with ID ${bootcampId} not found`);
+
+    if (body.bootcamp.user.toString() !== res.locals.user._id.toString() && res.locals.user.role !== "admin")
+      throw new ErrorResponse(401, `User with ID ${res.locals.user._id} is not authorized to create courses for bootcamp ${bootcampId}`);
 
     const data = await new Course(body).save();
 
@@ -71,9 +75,13 @@ export const createCourseByBootcampId: RequestHandler = asyncHandler(
 export const patchCourse: RequestHandler = asyncHandler(async (req, res) => {
   let course = await Course.findById(req.params.id);
 
-  if (course) Object.assign(course, req.body);
-  else
+  if (course)
+    Object.assign(course, req.body);
+  else if (!course)
     throw new ErrorResponse(404, `Course with id ${req.params.id} not found`);
+
+  if (course.user.toString() !== res.locals.user._id.toString() && res.locals.user.role !== "admin")
+    throw new ErrorResponse(401, `User with ID ${res.locals.user._id} is not authorized to update given course`);
 
   const data = await course.save();
 
@@ -87,10 +95,13 @@ export const patchCourse: RequestHandler = asyncHandler(async (req, res) => {
  * private
  */
 export const deleteCourse: RequestHandler = asyncHandler(async (req, res) => {
-  const result = await Course.findByIdAndDelete(req.params.id);
+  const course = await Course.findById(req.params.id);
 
-  if (!result)
-    throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
+  if (!course)
+    throw new ErrorResponse(404, `Course with id ${req.params.id} not found`);
+
+  if (course.user.toString() !== res.locals.user._id.toString() && res.locals.user.role !== "admin")
+    throw new ErrorResponse(401, `User with ID ${res.locals.user._id} is not authorized to delete given course`);
 
   res.json({ success: true });
 });
