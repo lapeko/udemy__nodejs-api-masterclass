@@ -14,8 +14,8 @@ export interface IUserDocument extends mongoose.Document {
   email: string;
   role: string;
   password: string;
-  resetPasswordToken: string;
-  resetPasswordExpire: string;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: string;
   updatedAt: NativeDate;
   createdAt: NativeDate;
   getJwtToken: () => string;
