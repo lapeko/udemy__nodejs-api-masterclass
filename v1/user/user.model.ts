@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
+import crypto from "crypto";
 
 import {ErrorResponse} from "../../utils/error-response";
 import {EnvVariable, getEnvVariable} from "../../utils/get-env-variable";
@@ -19,6 +20,7 @@ export interface IUserDocument extends mongoose.Document {
   createdAt: NativeDate;
   getJwtToken: () => string;
   checkPassword: (password: string) => Promise<boolean>;
+  resetPassword: () => string;
 }
 
 const userSchema = new mongoose.Schema({
@@ -65,6 +67,16 @@ userSchema.methods.getJwtToken = function() {
 
 userSchema.methods.checkPassword = function(password: string): Promise<boolean> {
   return bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.resetPassword = function() {
+  const resetToken =  crypto.randomBytes(20).toString("hex");
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+  return resetToken;
 };
 
 export const User = mongoose.model<IUserDocument>("User", userSchema);

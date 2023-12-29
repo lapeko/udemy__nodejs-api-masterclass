@@ -46,9 +46,31 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
  * @path:          "/api/v1/user/whoami"
  * @method:        GET
  */
-export const whoAmI: RequestHandler = (req, res, next) => {
+export const whoAmI: RequestHandler = asyncHandler((req, res, next) => {
   res.json({success: true, data: res.locals.user});
-};
+});
+
+/*
+ * @description:   Create reset password token
+ * @path:          "/api/v1/user/reset-password"
+ * @method:        GET
+ */
+export const resetPassword: RequestHandler = asyncHandler(async (req, res, next) => {
+  const email = req.body.email;
+  if (!email)
+    throw new ErrorResponse(400, "Email not provided");
+
+  const user = await User.findOne({email});
+
+  if (!user)
+    throw new ErrorResponse(404, `User with email ${email} does not exist`);
+
+  const token = user.resetPassword();
+
+  await user.save();
+
+  res.json({success: true, data: token});
+});
 
 function sendResWithToken <T>(user: IUserDocument, res: Response): void {
   const token = user.getJwtToken();
