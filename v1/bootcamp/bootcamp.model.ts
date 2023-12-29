@@ -82,8 +82,10 @@ const bootcampSchema = new mongoose.Schema(
       type: String,
       default: "no-photo.jpg",
     },
-    createdAt: String,
-    updatedAt: String,
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    }
   },
   {
     timestamps: true,

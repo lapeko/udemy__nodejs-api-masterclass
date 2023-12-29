@@ -1,12 +1,13 @@
-import { RequestHandler } from "express";
-import { join } from "path";
-import { writeFile } from "fs/promises";
+import {RequestHandler} from "express";
+import {join} from "path";
+import {writeFile} from "fs/promises";
 
-import { Bootcamp } from "./bootcamp.model";
-import { ErrorResponse } from "../../utils/error-response";
-import { asyncHandler } from "../../utils/async-handler";
-import { geocoder } from "../../utils/geocoder";
-import { EnvVariable, getEnvVariable } from "../../utils/get-env-variable";
+import {Bootcamp} from "./bootcamp.model";
+import {ErrorResponse} from "../../utils/error-response";
+import {asyncHandler} from "../../utils/async-handler";
+import {geocoder} from "../../utils/geocoder";
+import {EnvVariable, getEnvVariable} from "../../utils/get-env-variable";
+import {IUserDocument} from "../user/user.model";
 
 /*
  * @description:   Get all bootcamps
@@ -58,7 +59,13 @@ export const getBootcamp: RequestHandler = asyncHandler(async (req, res) => {
  * @method:        POST
  */
 export const insertBootcamp: RequestHandler = asyncHandler(async (req, res) => {
-  const data = await Bootcamp.create(req.body);
+  const user: IUserDocument = res.locals.user;
+  if (user.role !== "admin") {
+    const bootcamp = await Bootcamp.findOne({user: user._id});
+    if (bootcamp)
+      throw new ErrorResponse(400, "User already has a bootcamp");
+  }
+  const data = await Bootcamp.create({...req.body, user: user._id});
   res.json({ success: true, data });
 });
 

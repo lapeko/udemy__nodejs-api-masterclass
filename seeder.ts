@@ -1,13 +1,14 @@
 import "@colors/colors";
 import dotenv from "dotenv";
-import { readFileSync } from "fs";
+import {readFileSync} from "fs";
 import path from "path";
 
 dotenv.config({ path: "./config/.env" });
 
-import { connect } from "./config/db";
-import { Bootcamp } from "./v1/bootcamp/bootcamp.model";
-import { Course } from "./v1/course/course.model";
+import {connect} from "./config/db";
+import {Bootcamp} from "./v1/bootcamp/bootcamp.model";
+import {Course} from "./v1/course/course.model";
+import {User} from "./v1/user/user.model";
 
 const seedDb = async () => {
   await connect();
@@ -15,8 +16,9 @@ const seedDb = async () => {
   const courses = readMockFromFileSync("courses");
   await Bootcamp.create(bootcamps);
   for (const bootcamp of bootcamps) await Course.create(bootcamp);
+  // TODO add users
   for (const course of courses) await Course.create(course);
-  console.log("Bootcamps successfully inserted into DB".green.inverse);
+  console.log("DB successfully seeded".green.inverse);
   process.exit(0);
 };
 
@@ -24,7 +26,8 @@ const cleanDb = async () => {
   await connect();
   await Bootcamp.deleteMany();
   await Course.deleteMany();
-  console.log("Bootcamps successfully deleted from DB".red.inverse);
+  await User.deleteMany();
+  console.log("DB successfully cleaned up".red.inverse);
   process.exit(0);
 };
 
