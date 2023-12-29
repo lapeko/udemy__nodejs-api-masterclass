@@ -6,7 +6,6 @@ import {
   getBootcamp,
   insertBootcamp,
   deleteBootcamp,
-  putBootcamp,
   patchBootcamp,
   getBootcampsByZipCodeAndDistance,
   uploadLogo,
@@ -30,7 +29,6 @@ bootcampRouter.route("/")
 bootcampRouter.route("/:id")
   .get(getBootcamp)
   .delete(auth("publisher", "admin"), deleteBootcamp)
-  .put(auth("publisher", "admin"), putBootcamp)
   .patch(auth("publisher", "admin"), patchBootcamp);
 
 bootcampRouter.route("/:id/logo")

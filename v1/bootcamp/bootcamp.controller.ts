@@ -10,7 +10,7 @@ import {EnvVariable, getEnvVariable} from "../../utils/get-env-variable";
 import {IUserDocument} from "../user/user.model";
 
 /*
- * @description:   Get all bootcamps
+ * @description:   Gets all bootcamps
  * @path:          "/api/v1/bootcamp"
  * @method:        GET
  */
@@ -19,7 +19,7 @@ export const getBootcamps: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 /*
- * @description:   Get all bootcamps in radius
+ * @description:   Gets all bootcamps in radius
  * @path:          "/api/v1/bootcamp/radius/:zipcode/:radius"
  * @method:        GET
  */
@@ -42,7 +42,7 @@ export const getBootcampsByZipCodeAndDistance: RequestHandler = asyncHandler(
 );
 
 /*
- * @description:   Get one bootcamp
+ * @description:   Gets one bootcamp
  * @path:          "/api/v1/bootcamp/:id"
  * @method:        GET
  */
@@ -54,9 +54,10 @@ export const getBootcamp: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 /*
- * @description:   Create one new bootcamp
+ * @description:   Creates one new bootcamp
  * @path:          "/api/v1/bootcamp"
  * @method:        POST
+ * private
  */
 export const insertBootcamp: RequestHandler = asyncHandler(async (req, res) => {
   const user: IUserDocument = res.locals.user;
@@ -70,49 +71,38 @@ export const insertBootcamp: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 /*
- * @description:   Delete one bootcamp
+ * @description:   Deletes one bootcamp
  * @path:          "/api/v1/bootcamp/:id"
  * @method:        DELETE
+ * private
  */
 export const deleteBootcamp: RequestHandler = asyncHandler(async (req, res) => {
-  const result = await Bootcamp.findByIdAndDelete(req.params.id);
-  if (!result)
+  const bootcampToDelete = await Bootcamp.findById(req.params.id);
+  if (!bootcampToDelete)
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
+  if (bootcampToDelete.user.toString() !== res.locals.user._id.toString() && res.locals.role !== "admin")
+    throw new ErrorResponse(400, `User with ID ${res.locals.user._id} is not authorized to delete given bootcamp`);
   res.json({ success: true });
 });
 
 /*
- * @description:   Insert a bootcamp or replace if exist
- * @path:          "/api/v1/bootcamp/:id"
- * @method:        PUT
- */
-export const putBootcamp: RequestHandler = asyncHandler(async (req, res) => {
-  const options = { upsert: true, new: true, runValidators: true };
-  const data = await Bootcamp.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    options
-  );
-  res.json({ success: true, data: data });
-});
-
-/*
- * @description:   Update bootcamp's field(s)
+ * @description:   Updates bootcamp's field(s)
  * @path:          "/api/v1/bootcamp"
  * @method:        PATCH
  */
 export const patchBootcamp: RequestHandler = asyncHandler(async (req, res) => {
-  const options = { new: true, runValidators: true };
-  const data = await Bootcamp.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    options
-  );
+  const bootcampToUpdate = await Bootcamp.findById(req.params.id);
 
-  if (!data)
+  if (!bootcampToUpdate)
     throw new ErrorResponse(404, `Bootcamp with id ${req.params.id} not found`);
 
-  res.json({ success: true, data: data });
+  if (bootcampToUpdate.user.toString() !== res.locals.user._id.toString() && res.locals.role !== "admin")
+    throw new ErrorResponse(400, `User with ID ${res.locals.user._id} is not authorized to update given bootcamp`);
+
+  const data = await bootcampToUpdate.updateOne(req.body, { new: true, runValidators: true });
+
+
+  res.json({ success: true, data });
 });
 
 /*
@@ -126,6 +116,8 @@ export const uploadLogo: RequestHandler = asyncHandler(async (req, res) => {
   const bootcamp = await Bootcamp.findById(req.params.id);
 
   if (!bootcamp) throw new ErrorResponse(404, "Bootcamp with given ID does not exist");
+  if (bootcamp.user.toString() !== res.locals.user._id.toString() && res.locals.role !== "admin")
+    throw new ErrorResponse(400, `User with ID ${res.locals.user._id} is not authorized to upload logo forgiven bootcamp`);
   if (!file) throw new ErrorResponse(400, "Logo not provided");
   if (!file.mimetype.startsWith("image")) throw new ErrorResponse(400, "Provided logo file is not a picture");
   if (file.size > +getEnvVariable(EnvVariable.MAX_IMAGE_SIZE_KB) * 1024) throw new ErrorResponse(400, "Logo is too big");
