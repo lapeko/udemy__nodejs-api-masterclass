@@ -31,7 +31,7 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
   if (!email || !password)
     throw new ErrorResponse(400, "Login or password not provided");
 
-  const user = await User.findOne({email});
+  const user = await User.findOne({email}).select("+password");
 
   if (!user)
     throw new ErrorResponse(400, "Incorrect credentials");
@@ -134,7 +134,7 @@ export const confirmResetPassword: RequestHandler = asyncHandler(async (req, res
  */
 export const changePassword = asyncHandler(async (req, res) => {
   const {oldPassword, newPassword} = req.body;
-  const user: IUserDocument = res.locals.user;
+  const user: IUserDocument = await User.findById(res.locals.user._id).select("+password");
 
   const passwordCorrect = await user.checkPassword(oldPassword);
 
@@ -144,7 +144,25 @@ export const changePassword = asyncHandler(async (req, res) => {
   user.password = newPassword;
   await user.save();
 
-  res.json({success: true});
+  sendResWithToken(user, res);
+});
+
+/*
+ * @description:   Change details
+ * @path:          "/api/v1/user/change-details
+ * @method:        PATCH
+ */
+export const changeDetails: RequestHandler = asyncHandler(async (req, res) => {
+  const {name, email} = req.body;
+  const user: IUserDocument = res.locals.user;
+
+  // Object.assign(user, {name, email});
+  user.name = name;
+  user.email = email;
+
+  await user.save({validateBeforeSave: true});
+
+  res.json({success: true, data: user});
 });
 
 const sendResWithToken = <T>(user: IUserDocument, res: Response): void => {

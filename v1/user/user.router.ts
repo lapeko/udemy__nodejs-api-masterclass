@@ -2,6 +2,7 @@ import {Router} from "express";
 
 import {auth} from "../../middleware/auth";
 import {
+  changeDetails,
   changePassword,
   confirmResetPassword,
   createUser,
@@ -18,3 +19,4 @@ userRouter.get("/whoami", auth(), whoAmI);
 userRouter.post("/reset-password", resetPassword);
 userRouter.get("/confirm-reset-password/:token", confirmResetPassword);
 userRouter.post("/change-password", auth(), changePassword);
+userRouter.patch("/change-details", auth(), changeDetails);

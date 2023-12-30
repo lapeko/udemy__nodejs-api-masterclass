@@ -26,7 +26,7 @@ export interface IUserDocument extends mongoose.Document {
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: [true, "Please add a name"],
+    required: [true, "Please add a name"],
   },
   email: {
     type: String,
@@ -34,19 +34,20 @@ const userSchema = new mongoose.Schema({
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       "PLease add a valid email",
     ],
-    require: [true, "Please provide an email"],
+    required: [true, "Please provide an email"],
     unique: [true, "This email has already taken"],
   },
   role: {
     type: String,
     enum: ["user", "publisher"],
     default: "user",
-    require: [true, "Role is not provided"],
+    required: [true, "Role is not provided"],
   },
   password: {
     type: String,
     minLength: [6, "Password should have at least 6 characters"],
-    require: [true, "Password not provided"],
+    required: [true, "Password not provided"],
+    select: false,
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,

@@ -26,26 +26,26 @@ const courseSchema = new mongoose.Schema(
     title: {
       type: String,
       trim: true,
-      require: [true, "Provide title"],
+      required: [true, "Provide title"],
     },
     description: {
       type: String,
-      require: [true, "Provide description"],
+      required: [true, "Provide description"],
     },
     weeks: {
       type: Number,
       min: [1, "Weeks should be positive"],
-      require: [true, "Provide weeks"],
+      required: [true, "Provide weeks"],
     },
     tuition: {
       type: Number,
       min: [0, "Weeks should not be negative"],
-      require: [true, "Provide tuition"],
+      required: [true, "Provide tuition"],
     },
     minimumSkill: {
       type: String,
       enum: ["beginner", "intermediate", "advanced"],
-      require: [true, "Provide minimumSkill"],
+      required: [true, "Provide minimumSkill"],
     },
     scholarhipsAvailable: {
       type: Boolean,
@@ -54,12 +54,12 @@ const courseSchema = new mongoose.Schema(
     bootcamp: {
       type: mongoose.Schema.ObjectId,
       ref: "Bootcamp",
-      require: true,
+      required: true,
     },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     }
   },
   { timestamps: true }
