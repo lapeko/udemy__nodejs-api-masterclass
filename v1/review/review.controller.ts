@@ -62,7 +62,8 @@ export const createReview = asyncHandler(async (req, res) => {
   body.user = res.locals.user._id;
   body.bootcamp = req.params.bootcampId;
 
-  const data = await Review.create(body);
+  const review = new Review(body);
+  const data = await review.save();
 
   res.send({success: true, data});
 });
@@ -79,13 +80,8 @@ export const deleteReviewById = asyncHandler(async (req, res) => {
   if (user._id !== req.params.id && user.role !== "admin")
     throw new ErrorResponse(401, "You not allowed to delete this review");
 
-  const review = await Review.findById(req.params.id);
+  await Review.findByIdAndDelete(req.params.id);
 
-  if (!review)
-    throw new ErrorResponse(404, "Review not found");
-
-  await review.deleteOne();
-  
   res.send({success: true});
 });
 

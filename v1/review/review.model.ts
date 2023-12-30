@@ -2,16 +2,17 @@ import mongoose, {Document} from "mongoose";
 
 import {ErrorResponse} from "../../utils/error-response";
 import {Bootcamp} from "../bootcamp/bootcamp.model";
-import {Course} from "../course/course.model";
 
 interface IReviewDocument extends Document {
   title: string;
-  description: string;
+  text: string;
   rating: number;
+  user: mongoose.Types.ObjectId;
+  bootcamp: mongoose.Types.ObjectId;
 }
 
 interface IReviewModel extends mongoose.Model<IReviewDocument> {
-  updateAverageRating: (rating: IReviewModel) => void;
+  updateAverageRating: (bootcampId: mongoose.Types.ObjectId) => void;
 }
 
 const ReviewSchema = new mongoose.Schema({
@@ -49,25 +50,30 @@ const ReviewSchema = new mongoose.Schema({
 ReviewSchema.static(
   "updateAverageRating",
   async function (bootcampId: mongoose.Types.ObjectId) {
-    const [response] = await Course.aggregate([
+    const [response] = await Review.aggregate([
       { $match: { bootcamp: bootcampId } },
-      { $group: { _id: "$bootcamp", averageCost: { $avg: "$tuition" } } },
+      { $group: { _id: "$bootcamp", averageRating: { $avg: "$rating" } } },
     ]);
 
     if (!response)
-      throw new ErrorResponse(
-        500,
-        `Bootcamp aggregation error. Bootcamp with ID ${bootcampId} not found`
-      );
+      throw new ErrorResponse(500, `Bootcamp aggregation error. Bootcamp with ID ${bootcampId} not found`);
 
-    const bootcamp = await Bootcamp.findOne({ _id: bootcampId });
+    const bootcamp = await Bootcamp.findById(bootcampId.toString());
+
     if (bootcamp) {
-      Object.assign(bootcamp, {averageCost: Math.ceil(response.averageCost / 10) * 10});
+      Object.assign(bootcamp, {averageRating: Math.ceil(response.averageRating * 100) / 100});
       await bootcamp.save();
     }
   }
 );
 
-// ReviewSchema.post("save")
+ReviewSchema.pre("save", function () {
+  if (this.isModified("rating"))
+    Review.updateAverageRating(this.bootcamp);
+});
+
+ReviewSchema.post("findOneAndDelete", function (doc) {
+  Review.updateAverageRating(doc.bootcamp._id);
+});
 
 export const Review = mongoose.model<IReviewDocument, IReviewModel>("Review", ReviewSchema);
