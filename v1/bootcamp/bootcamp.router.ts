@@ -16,14 +16,13 @@ import {Bootcamp} from "./bootcamp.model";
 import {auth} from "../../middleware/auth";
 
 const upload = multer({ storage: multer.memoryStorage() });
-const advancedResults = useAdvancedResults(Bootcamp, [{path: "courses", select: "title description"}]);
 
 export const bootcampRouter = Router();
 
 bootcampRouter.use("/:bootcampId/courses", courseRouter);
 
 bootcampRouter.route("/")
-  .get(advancedResults, getBootcamps)
+  .get(useAdvancedResults(Bootcamp, [{path: "courses", select: "title description"}]), getBootcamps)
   .post(auth("publisher", "admin"), insertBootcamp);
 
 bootcampRouter.route("/:id")

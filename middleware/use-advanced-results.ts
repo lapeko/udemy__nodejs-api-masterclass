@@ -1,18 +1,22 @@
-import {RequestHandler, Request, Response, NextFunction} from "express";
-import {Model} from "mongoose";
+import { Request, Response, NextFunction } from "express";
+import { Model, Document } from "mongoose";
 
-import {Bootcamp} from "../v1/bootcamp/bootcamp.model";
-import {ErrorResponse} from "../utils/error-response";
-import {asyncHandler} from "../utils/async-handler";
+import { ErrorResponse } from "../utils/error-response";
+import { asyncHandler } from "../utils/async-handler";
 
-type UseAdvancedResults = <T>(model: Model<T>, populate?: Array<{path: string, select?: string}>) => (req: Request, res: Response, next: NextFunction) => void;
+type UseAdvancedResults = <T extends Document>(model: Model<T>, populate?: Array<{ path: string, select?: string }>) => (req: Request, res: Response, next: NextFunction) => void;
 
-export const useAdvancedResults: UseAdvancedResults = (model, populate) => asyncHandler(async (req, res, next) => {
+export const useAdvancedResults: UseAdvancedResults = <T extends Document>(
+  model: Model<T>,
+  populate?: Array<{ path: string, select?: string }>
+) => asyncHandler(async (req, res, next) => {
   const deleteKeys = ["select", "sort", "page", "limit"];
 
-  const query = { ...req.query };
-  deleteKeys.forEach((key) => {
-    delete query[key];
+  let queryObj: Record<string, any> = {};
+  Object.keys(req.query).forEach((key) => {
+    if (!deleteKeys.includes(key) && key in model.schema.paths) {
+      queryObj[key] = req.query[key];
+    }
   });
 
   const count = await model.countDocuments();
@@ -28,7 +32,7 @@ export const useAdvancedResults: UseAdvancedResults = (model, populate) => async
     : "-createdAt";
   const skip = (page - 1) * limit;
 
-  const request = Bootcamp.find(query);
+  const request = model.find(queryObj);
   select && request.select(select);
   request.sort(sort);
   request.skip(skip);
@@ -46,6 +50,8 @@ export const useAdvancedResults: UseAdvancedResults = (model, populate) => async
   }
 
   if (populate) request.populate(populate);
+
+  console.log(req.query);
 
   const data = await request;
 

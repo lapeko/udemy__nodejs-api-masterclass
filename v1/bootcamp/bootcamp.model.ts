@@ -1,8 +1,35 @@
-import mongoose from "mongoose";
+import mongoose, {Document, Model} from "mongoose";
 import slugify from "slugify";
 
 import { ErrorResponse } from "../../utils/error-response";
 import { geocoder } from "../../utils/geocoder";
+
+type BootcampLocation = {
+  type: "Point";
+  coordinates?: number;
+  formattedAddress: string;
+  street: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+};
+
+interface BootcampDocument extends Document {
+  name: string;
+  slug: string;
+  description: string;
+  website: string;
+  phone: string;
+  email: string;
+  address: string;
+  location: BootcampLocation,
+  careers: Array<"Web Development" | "Mobile Development" | "UI/UX" | "Data Science" | "Business" | "Other">;
+  averageRating: number;
+  averageCost: number;
+  photo: string;
+  user: mongoose.Schema.Types.ObjectId;
+}
 
 const locationSchema = new mongoose.Schema({
   type: {
@@ -135,4 +162,4 @@ bootcampSchema.virtual("courses", {
   justOne: false,
 });
 
-export const Bootcamp = mongoose.model("Bootcamp", bootcampSchema);
+export const Bootcamp = mongoose.model<BootcampDocument>('Bootcamp', bootcampSchema);

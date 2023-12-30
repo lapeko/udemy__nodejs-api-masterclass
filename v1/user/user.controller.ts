@@ -49,7 +49,7 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
  * @path:          "/api/v1/user/whoami"
  * @method:        GET
  */
-export const whoAmI: RequestHandler = asyncHandler((req, res) => {
+export const whoAmI: RequestHandler = asyncHandler((_, res) => {
   res.json({success: true, data: res.locals.user});
 });
 
@@ -151,18 +151,61 @@ export const changePassword = asyncHandler(async (req, res) => {
  * @description:   Change details
  * @path:          "/api/v1/user/change-details
  * @method:        PATCH
+ * private
  */
 export const changeDetails: RequestHandler = asyncHandler(async (req, res) => {
   const {name, email} = req.body;
   const user: IUserDocument = res.locals.user;
 
-  // Object.assign(user, {name, email});
-  user.name = name;
-  user.email = email;
+  if (name != null) user.name = name;
+  if (email != null) user.email = email;
 
-  await user.save({validateBeforeSave: true});
+  await user.save();
 
   res.json({success: true, data: user});
+});
+
+/*
+ * @description:   Get all user
+ * @path:          "/api/v1/user
+ * @method:        GET
+ * admin
+ */
+export const getUsers: RequestHandler = asyncHandler(async (_, res) => {
+  res.json({success: true, data: res.locals.advancedResults});
+});
+
+/*
+ * @description:   Get user by id
+ * @path:          "/api/v1/user/:id
+ * @method:        GET
+ * admin
+ */
+export const getUserById: RequestHandler = asyncHandler(async (req, res) => {
+  const data = await User.findById(req.params.id);
+  res.json({success: true, data});
+});
+
+/*
+ * @description:   Delete user
+ * @path:          "/api/v1/user/:id
+ * @method:        DELETE
+ * admin
+ */
+export const deleteUser: RequestHandler = asyncHandler(async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json({success: true});
+});
+
+/*
+ * @description:   Update user
+ * @path:          "/api/v1/user/:id
+ * @method:        PATCH
+ * admin
+ */
+export const updateUser: RequestHandler = asyncHandler(async (req, res) => {
+  const data = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
+  res.json({success: true, data});
 });
 
 const sendResWithToken = <T>(user: IUserDocument, res: Response): void => {
