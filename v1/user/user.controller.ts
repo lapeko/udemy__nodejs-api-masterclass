@@ -49,7 +49,7 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
  * @path:          "/api/v1/user/whoami"
  * @method:        GET
  */
-export const whoAmI: RequestHandler = asyncHandler((req, res, next) => {
+export const whoAmI: RequestHandler = asyncHandler((req, res) => {
   res.json({success: true, data: res.locals.user});
 });
 
@@ -58,7 +58,7 @@ export const whoAmI: RequestHandler = asyncHandler((req, res, next) => {
  * @path:          "/api/v1/user/reset-password"
  * @method:        POST
  */
-export const resetPassword: RequestHandler = asyncHandler(async (req, res, next) => {
+export const resetPassword: RequestHandler = asyncHandler(async (req, res) => {
   const email = req.body.email;
   if (!email)
     throw new ErrorResponse(400, "Email not provided");
@@ -88,10 +88,10 @@ export const resetPassword: RequestHandler = asyncHandler(async (req, res, next)
 
 /*
  * @description:   Reset password step 2
- * @path:          "/api/v1/user/confirm-reset-password"
+ * @path:          "/api/v1/user/confirm-reset-password/:token"
  * @method:        GET
  */
-export const confirmResetPassword: RequestHandler = asyncHandler(async (req, res, next) => {
+export const confirmResetPassword: RequestHandler = asyncHandler(async (req, res) => {
   const token = req.params.token;
 
   if (!token)
@@ -127,6 +127,26 @@ export const confirmResetPassword: RequestHandler = asyncHandler(async (req, res
   sendResetPasswordResponse(200, "New password was successfully created and sent to your email", res);
 });
 
+/*
+ * @description:   Change password
+ * @path:          "/api/v1/user/change-password
+ * @method:        POST
+ */
+export const changePassword = asyncHandler(async (req, res) => {
+  const {oldPassword, newPassword} = req.body;
+  const user: IUserDocument = res.locals.user;
+
+  const passwordCorrect = await user.checkPassword(oldPassword);
+
+  if (!passwordCorrect)
+    throw new ErrorResponse(400, "Incorrect old password");
+
+  user.password = newPassword;
+  await user.save();
+
+  res.json({success: true});
+});
+
 const sendResWithToken = <T>(user: IUserDocument, res: Response): void => {
   const token = user.getJwtToken();
 
@@ -138,8 +158,9 @@ const sendResWithToken = <T>(user: IUserDocument, res: Response): void => {
 
   res
     .cookie("token", token, options)
-    .json({success: true, data: token});
+  .json({success: true, data: token});
 }
+
 
 const sendResetPasswordResponse = (status: number, message: string, res: Response): void => {
   res.status(status).contentType("text/html").send(`

@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minLength: [6, "Password should be longer than 6 characters"],
+    minLength: [6, "Password should have at least 6 characters"],
     require: [true, "Password not provided"],
   },
   resetPasswordToken: String,
@@ -55,7 +55,11 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function(next) {
-  if (!this.password) throw new ErrorResponse(400, "Password not provided");
+  if (!this.isModified("password"))
+    return next();
+
+  if (!this.password)
+    throw new ErrorResponse(400, "Password not provided");
 
   this.password = await bcrypt.hash(this.password, 10);
   next();
