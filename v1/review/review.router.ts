@@ -1,12 +1,13 @@
 import {Router} from "express";
 
 import {auth} from "../../middleware/auth";
-import {getAllReviewsByBootcamp, getAllReviewsByUser} from "./review.controller";
+import {getAllReviewsByBootcamp, getAllReviewsByUser, getReviewById} from "./review.controller";
 import {Review} from "./review.model";
 
 export const reviewRouter = Router({mergeParams: true});
 
-// reviewRouter.route("/")
+reviewRouter.route("/:id")
+  .get(getReviewById);
 
 // getAllReviews
 // getAllById

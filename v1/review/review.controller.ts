@@ -8,13 +8,7 @@ import {Review} from "./review.model";
  * @method:        GET
  */
 export const getAllReviewsByUser = asyncHandler(async (req, res) => {
-  if (!req.params.userId)
-    throw new ErrorResponse(400, "UserID not received");
-
-  const data = await Review.find({user: req.params.userId}).populate({
-    path: "user",
-    select: "name email",
-  });
+  const data = await Review.find({user: req.params.userId});
 
   res.send({success: true, data});
 });
@@ -25,10 +19,21 @@ export const getAllReviewsByUser = asyncHandler(async (req, res) => {
  * @method:        GET
  */
 export const getAllReviewsByBootcamp = asyncHandler(async (req, res) => {
-  if (!req.params.bootcampId)
-    throw new ErrorResponse(400, "BootcampID not received");
-
   const data = await Review.find({bootcamp: req.params.bootcampId}).populate({
+    path: "bootcamp",
+    select: "name description",
+  });
+
+  res.send({success: true, data});
+});
+
+/*
+ * @description:   Get review by ID
+ * @path:         /api/v1/review/:id
+ * @method:        GET
+ */
+export const getReviewById = asyncHandler(async (req, res) => {
+  const data = await Review.findById(req.params.id).populate({
     path: "bootcamp",
     select: "name description",
   });

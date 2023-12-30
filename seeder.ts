@@ -9,16 +9,19 @@ import {connect} from "./config/db";
 import {Bootcamp} from "./v1/bootcamp/bootcamp.model";
 import {Course} from "./v1/course/course.model";
 import {User} from "./v1/user/user.model";
+import {Review} from "./v1/review/review.model";
 
 const seedDb = async () => {
   await connect();
   const users = readMockFromFileSync("users");
   const bootcamps = readMockFromFileSync("bootcamps");
   const courses = readMockFromFileSync("courses");
+  const reviews = readMockFromFileSync("reviews");
 
   for (const user of users) await User.create(user);
   for (const bootcamp of bootcamps) await Bootcamp.create(bootcamp);
   for (const course of courses) await Course.create(course);
+  for (const review of reviews) await Review.create(review);
 
   console.log("DB successfully seeded".green.inverse);
   process.exit(0);
@@ -30,6 +33,7 @@ const cleanDb = async () => {
   await Bootcamp.deleteMany();
   await Course.deleteMany();
   await User.deleteMany();
+  await Review.deleteMany();
 
   console.log("DB successfully cleaned up".red.inverse);
   process.exit(0);
