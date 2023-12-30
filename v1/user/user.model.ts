@@ -23,7 +23,7 @@ export interface IUserDocument extends mongoose.Document {
   resetPassword: () => string;
 }
 
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please add a name"],
@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-userSchema.pre("save", async function(next) {
+UserSchema.pre("save", async function(next) {
   if (!this.isModified("password"))
     return next();
 
@@ -66,15 +66,15 @@ userSchema.pre("save", async function(next) {
   next();
 });
 
-userSchema.methods.getJwtToken = function() {
+UserSchema.methods.getJwtToken = function() {
   return jsonwebtoken.sign({id: this._id}, jwtSecret, {expiresIn: jwtExpiresIn});
 };
 
-userSchema.methods.checkPassword = function(password: string): Promise<boolean> {
+UserSchema.methods.checkPassword = function(password: string): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.resetPassword = function() {
+UserSchema.methods.resetPassword = function() {
   const resetToken =  crypto.randomBytes(20).toString("hex");
   this.resetPasswordToken = crypto
     .createHash("sha256")
@@ -84,4 +84,4 @@ userSchema.methods.resetPassword = function() {
   return resetToken;
 };
 
-export const User = mongoose.model<IUserDocument>("User", userSchema);
+export const User = mongoose.model<IUserDocument>("User", UserSchema);

@@ -1,4 +1,4 @@
-import mongoose, {Document, Model} from "mongoose";
+import mongoose, {Document} from "mongoose";
 import slugify from "slugify";
 
 import { ErrorResponse } from "../../utils/error-response";
@@ -31,7 +31,7 @@ interface BootcampDocument extends Document {
   user: mongoose.Schema.Types.ObjectId;
 }
 
-const locationSchema = new mongoose.Schema({
+const LocationSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ["Point"],
@@ -50,7 +50,7 @@ const locationSchema = new mongoose.Schema({
   country: String,
 });
 
-const bootcampSchema = new mongoose.Schema(
+const BootcampSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -86,7 +86,7 @@ const bootcampSchema = new mongoose.Schema(
     address: {
       type: String,
     },
-    location: locationSchema,
+    location: LocationSchema,
     careers: {
       type: [String],
       required: true,
@@ -122,12 +122,12 @@ const bootcampSchema = new mongoose.Schema(
   }
 );
 
-bootcampSchema.pre("save", function (next) {
+BootcampSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
 
-bootcampSchema.pre("save", async function (next) {
+BootcampSchema.pre("save", async function (next) {
   if (this.location) next();
 
   if (!this.address) throw new ErrorResponse(400, "Address was not provided");
@@ -149,17 +149,17 @@ bootcampSchema.pre("save", async function (next) {
   next();
 });
 
-bootcampSchema.pre("deleteOne", async function (next) {
+BootcampSchema.pre("deleteOne", async function (next) {
   const Course = mongoose.model("Course");
   await Course.deleteMany({ bootcamp: this.getQuery()._id });
   next();
 });
 
-bootcampSchema.virtual("courses", {
+BootcampSchema.virtual("courses", {
   ref: "Course",
   localField: "_id",
   foreignField: "bootcamp",
   justOne: false,
 });
 
-export const Bootcamp = mongoose.model<BootcampDocument>('Bootcamp', bootcampSchema);
+export const Bootcamp = mongoose.model<BootcampDocument>('Bootcamp', BootcampSchema);

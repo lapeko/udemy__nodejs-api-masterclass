@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 import { Bootcamp } from "../bootcamp/bootcamp.model";
 import { ErrorResponse } from "../../utils/error-response";
 
@@ -21,7 +22,7 @@ interface ICourseModel extends mongoose.Model<ICourseDocument> {
   ): Promise<{ success: boolean }>;
 }
 
-const courseSchema = new mongoose.Schema(
+const CourseSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -65,7 +66,7 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-courseSchema.static(
+CourseSchema.static(
   "updateAverageCost",
   async function (bootcampId: mongoose.Types.ObjectId) {
     const [response] = await Course.aggregate([
@@ -87,14 +88,11 @@ courseSchema.static(
   }
 );
 
-courseSchema.post("save", async function () {
-  Course.updateAverageCost(this.bootcamp!._id);
+CourseSchema.post("save", async function () {
+  await Course.updateAverageCost(this.bootcamp!._id);
 });
-courseSchema.post("findOneAndDelete", async function (doc) {
-  Course.updateAverageCost(doc.bootcamp._id);
+CourseSchema.post("findOneAndDelete", async function (doc) {
+  await Course.updateAverageCost(doc.bootcamp._id);
 });
 
-export const Course = mongoose.model<ICourseDocument, ICourseModel>(
-  "Course",
-  courseSchema
-);
+export const Course = mongoose.model<ICourseDocument, ICourseModel>("Course", CourseSchema);

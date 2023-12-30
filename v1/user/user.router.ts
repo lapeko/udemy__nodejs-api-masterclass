@@ -16,6 +16,7 @@ import {
 } from "./user.controller";
 import {useAdvancedResults} from "../../middleware/use-advanced-results";
 import {User} from "./user.model";
+import {reviewRouter} from "../review/review.router";
 
 export const userRouter =  Router();
 
@@ -33,4 +34,7 @@ userRouter.route("/:id")
   .get(auth("admin"), getUserById)
   .delete(auth("admin"), deleteUser)
   .patch(auth("admin"), updateUser);
+
+userRouter.get("/:userId/reviews", (req, res) =>
+  res.redirect(`/api/v1/review/${req.params.userId}/userReviews`));
 
