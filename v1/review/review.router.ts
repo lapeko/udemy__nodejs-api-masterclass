@@ -2,27 +2,23 @@ import {Router} from "express";
 
 import {auth} from "../../middleware/auth";
 import {
-  createReview,
+  createReview, getAllReviews,
   getAllReviewsByBootcamp,
   getAllReviewsByUser,
   getReviewById,
 } from "./review.controller";
+import {useAdvancedResults} from "../../middleware/use-advanced-results";
+import {Review} from "./review.model";
 
 export const reviewRouter = Router({mergeParams: true});
 
+reviewRouter.get("/", auth("admin"), useAdvancedResults(Review), getAllReviews);
 reviewRouter.route("/:id")
-  .get(getReviewById);
+  .get(getReviewById)
 
-reviewRouter.post("/:courseId", auth(), createReview);
-
-
-// getAllReviews
-// getAllById
 // deleteReviewById
 // updateReviewById
 
-// getAllByBootcamp
-// createReviewByBootcamp
-
+reviewRouter.post("/:bootcampId", auth(), createReview);
 reviewRouter.get("/:userId/user-reviews", getAllReviewsByUser);
 reviewRouter.get("/:bootcampId/bootcamp-reviews", getAllReviewsByBootcamp);

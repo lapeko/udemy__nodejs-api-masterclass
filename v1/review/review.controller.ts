@@ -1,6 +1,15 @@
 import {asyncHandler} from "../../utils/async-handler";
 import {Review} from "./review.model";
-import {ErrorResponse} from "../../utils/error-response";
+
+/*
+ * @description:   Get all reviews
+ * @path:          /api/v1/user/
+ * @method:        GET
+ * admin
+ */
+export const getAllReviews = asyncHandler(async (req, res) => {
+  res.send(res.locals.advancedResults);
+});
 
 /*
  * @description:   Get reviews for user
@@ -43,11 +52,18 @@ export const getReviewById = asyncHandler(async (req, res) => {
 
 /*
  * @description:   Create review
- * @path:          /api/v1/review/:id
- * @method:        GET
+ * @path:          /api/v1/review/:bootcampId
+ * @method:        POST
  * authenticated
  */
 export const createReview = asyncHandler(async (req, res) => {
-  // res.locals.user;
-  // req.params.courseId;
+  const body = req.body;
+  body.user = res.locals.user._id;
+  body.bootcamp = req.params.bootcampId;
+
+  console.log(body)
+
+  const data = await Review.create(body);
+
+  res.send({success: true, data});
 });

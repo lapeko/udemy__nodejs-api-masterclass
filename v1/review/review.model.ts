@@ -18,21 +18,21 @@ const ReviewSchema = new mongoose.Schema({
   title: {
     type: String,
     trim: true,
-    maxLength: [100, "Title length is too long"],
-    required: [true, "PLease, provide a title"],
+    maxLength: 100,
+    required: true,
   },
   text: {
     type: String,
     trim: true,
-    minLength: [6, "Description should be at least 6 characters"],
-    maxLength: [1000, "Description should have maximum 1000 characters"],
-    required: [true, "Please provide description"],
+    minLength: 6,
+    maxLength: 1000,
+    required: true,
   },
   rating: {
     type: Number,
     min: 1,
     max: 10,
-    required: [true, "PLease, provide your rating"],
+    required: true,
   },
   user: {
     type: mongoose.Schema.ObjectId,
