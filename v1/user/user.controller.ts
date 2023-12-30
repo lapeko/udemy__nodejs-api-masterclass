@@ -193,6 +193,9 @@ export const getUserById: RequestHandler = asyncHandler(async (req, res) => {
  * admin
  */
 export const deleteUser: RequestHandler = asyncHandler(async (req, res) => {
+  if (res.locals.user.id !== req.params.id && res.locals.user.role !== "admin")
+    throw new ErrorResponse(401, "Not allowed to delete this user");
+
   await User.findByIdAndDelete(req.params.id);
   res.json({success: true});
 });
@@ -204,6 +207,9 @@ export const deleteUser: RequestHandler = asyncHandler(async (req, res) => {
  * admin
  */
 export const updateUser: RequestHandler = asyncHandler(async (req, res) => {
+  if (res.locals.user.id !== req.params.id && res.locals.user.role !== "admin")
+    throw new ErrorResponse(401, "Not allowed to update this user");
+
   const data = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
   res.json({success: true, data});
 });

@@ -32,8 +32,8 @@ userRouter.patch("/change-details", auth(), changeDetails);
 userRouter.get("/", auth("admin"), useAdvancedResults(User), getUsers);
 userRouter.route("/:id")
   .get(auth("admin"), getUserById)
-  .delete(auth("admin"), deleteUser)
-  .patch(auth("admin"), updateUser);
+  .delete(auth(), deleteUser)
+  .patch(auth(), updateUser);
 
 userRouter.get("/:userId/reviews", (req, res) =>
   res.redirect(`/api/v1/review/${req.params.userId}/user-reviews`));
