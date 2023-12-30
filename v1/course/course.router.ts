@@ -24,4 +24,5 @@ courseRouter
   .patch(auth("publisher", "admin"), patchCourse)
   .delete(auth("publisher", "admin"), deleteCourse);
 
-courseRouter.get("/:bootcampId/bootcampCourses", getBootcampCourses);
+courseRouter
+  .get("/:bootcampId/bootcamp-courses", getBootcampCourses);

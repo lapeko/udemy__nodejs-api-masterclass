@@ -36,5 +36,5 @@ userRouter.route("/:id")
   .patch(auth("admin"), updateUser);
 
 userRouter.get("/:userId/reviews", (req, res) =>
-  res.redirect(`/api/v1/review/${req.params.userId}/userReviews`));
+  res.redirect(`/api/v1/review/${req.params.userId}/user-reviews`));
 

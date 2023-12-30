@@ -34,6 +34,6 @@ bootcampRouter.route("/radius/:zipcode/:radius")
   .get(getBootcampsByZipCodeAndDistance);
 
 bootcampRouter.get("/:bootcampId/courses", (req, res) =>
-  res.redirect(`/api/v1/course/${req.params.bootcampId}/bootcampCourses`));
+  res.redirect(`/api/v1/course/${req.params.bootcampId}/bootcamp-courses`));
 bootcampRouter.get("/:bootcampId/reviews", (req, res) =>
-  res.redirect(`/api/v1/review/${req.params.bootcampId}/bootcampReviews`));
+  res.redirect(`/api/v1/review/${req.params.bootcampId}/bootcamp-reviews`));

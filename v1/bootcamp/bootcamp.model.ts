@@ -151,7 +151,9 @@ BootcampSchema.pre("save", async function (next) {
 
 BootcampSchema.pre("deleteOne", async function (next) {
   const Course = mongoose.model("Course");
+  const Review = mongoose.model("Review");
   await Course.deleteMany({ bootcamp: this.getQuery()._id });
+  await Review.deleteMany({ bootcamp: this.getQuery()._id });
   next();
 });
 

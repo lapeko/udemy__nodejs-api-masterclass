@@ -1,10 +1,10 @@
 import {asyncHandler} from "../../utils/async-handler";
-import {ErrorResponse} from "../../utils/error-response";
 import {Review} from "./review.model";
+import {ErrorResponse} from "../../utils/error-response";
 
 /*
  * @description:   Get reviews for user
- * @path:         /api/v1/user/:userId/userReviews
+ * @path:          /api/v1/user/:userId/userReviews
  * @method:        GET
  */
 export const getAllReviewsByUser = asyncHandler(async (req, res) => {
@@ -15,7 +15,7 @@ export const getAllReviewsByUser = asyncHandler(async (req, res) => {
 
 /*
  * @description:   Get reviews for bootcamp
- * @path:         /api/v1/bootcamp/:bootcampId/bootcampReviews
+ * @path:          /api/v1/bootcamp/:bootcampId/bootcampReviews
  * @method:        GET
  */
 export const getAllReviewsByBootcamp = asyncHandler(async (req, res) => {
@@ -29,7 +29,7 @@ export const getAllReviewsByBootcamp = asyncHandler(async (req, res) => {
 
 /*
  * @description:   Get review by ID
- * @path:         /api/v1/review/:id
+ * @path:          /api/v1/review/:id
  * @method:        GET
  */
 export const getReviewById = asyncHandler(async (req, res) => {
@@ -39,4 +39,15 @@ export const getReviewById = asyncHandler(async (req, res) => {
   });
 
   res.send({success: true, data});
+});
+
+/*
+ * @description:   Create review
+ * @path:          /api/v1/review/:id
+ * @method:        GET
+ * authenticated
+ */
+export const createReview = asyncHandler(async (req, res) => {
+  // res.locals.user;
+  // req.params.courseId;
 });
