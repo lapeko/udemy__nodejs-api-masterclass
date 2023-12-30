@@ -1,5 +1,6 @@
 import {asyncHandler} from "../../utils/async-handler";
 import {Review} from "./review.model";
+import {ErrorResponse} from "../../utils/error-response";
 
 /*
  * @description:   Get all reviews
@@ -61,9 +62,51 @@ export const createReview = asyncHandler(async (req, res) => {
   body.user = res.locals.user._id;
   body.bootcamp = req.params.bootcampId;
 
-  console.log(body)
-
   const data = await Review.create(body);
+
+  res.send({success: true, data});
+});
+
+/*
+ * @description:   Delete review by ID
+ * @path:          /api/v1/review/:id
+ * @method:        DELETE
+ * authenticated
+ */
+export const deleteReviewById = asyncHandler(async (req, res) => {
+  const user = res.locals.user;
+
+  if (user._id !== req.params.id && user.role !== "admin")
+    throw new ErrorResponse(401, "You not allowed to delete this review");
+
+  const review = await Review.findById(req.params.id);
+
+  if (!review)
+    throw new ErrorResponse(404, "Review not found");
+
+  await review.deleteOne();
+  
+  res.send({success: true});
+});
+
+/*
+ * @description:   Update review by ID
+ * @path:          /api/v1/review/:id
+ * @method:        PATCH
+ * authenticated
+ */
+export const updateReviewById = asyncHandler(async (req, res) => {
+  const user = res.locals.user;
+  if (user._id !== req.params.id && user.role !== "admin")
+    throw new ErrorResponse(401, "You not allowed to update this review");
+
+  const review = await Review.findById(req.params.id);
+
+  if (!review)
+    throw new ErrorResponse(404, `Review with ID: ${req.params.id} not found`);
+
+  Object.assign(review, req.body);
+  const data = await review.save();
 
   res.send({success: true, data});
 });
