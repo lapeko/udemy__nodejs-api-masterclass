@@ -7,25 +7,30 @@ import { Bootcamp } from "../bootcamp/bootcamp.model";
 
 /*
  * @description:   Get all courses
- * @path:         ["/api/v1/course", "/api/v1/bootcamp/:bootcampId/courses"]
+ * @path:          /api/v1/course
  * @method:        GET
  */
 export const getAllCourses: RequestHandler = asyncHandler(async (req, res) => {
-  const request = req.params.bootcampId
-    ? Course.find({ bootcamp: req.params.bootcampId })
-    : Course.find();
+  res.json(res.locals.advancedResults);
+});
 
-  const data = await request.populate({
+/*
+ * @description:   Get bootcamp courses
+ * @path:          /api/v1/bootcamp/:bootcampId/courses
+ * @method:        GET
+ */
+export const getBootcampCourses: RequestHandler = asyncHandler(async (req, res) => {
+  const courses = await Course.find({ bootcamp: req.params.bootcampId }).populate({
     path: "bootcamp",
     select: "name description",
   });
 
-  res.json({ success: true, data, count: data.length });
+  res.json({ success: true, data: {courses, count: courses.length} });
 });
 
 /*
  * @description:   Get course by id
- * @path:         "/api/v1/course/:id"
+ * @path:          /api/v1/course/:id
  * @method:        GET
  */
 export const getCourseById: RequestHandler = asyncHandler(async (req, res) => {
@@ -42,7 +47,7 @@ export const getCourseById: RequestHandler = asyncHandler(async (req, res) => {
 
 /*
  * @description:   Create course for bootcamp
- * @path:         "/api/v1/bootcamp/:bootcampId/courses"
+ * @path:          /api/v1/bootcamp/:bootcampId/courses
  * @method:        POST
  * private
  */
@@ -68,7 +73,7 @@ export const createCourseByBootcampId: RequestHandler = asyncHandler(
 
 /*
  * @description:   Patch a course
- * @path:         "/api/v1/bootcamp/:id"
+ * @path:          /api/v1/bootcamp/:id
  * @method:        PATCH
  * private
  */
@@ -90,7 +95,7 @@ export const patchCourse: RequestHandler = asyncHandler(async (req, res) => {
 
 /*
  * @description:   Delete a course
- * @path:         "/api/v1/bootcamp/:id"
+ * @path:          /api/v1/bootcamp/:id
  * @method:        DELETE
  * private
  */

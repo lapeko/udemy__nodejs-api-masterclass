@@ -51,8 +51,6 @@ export const useAdvancedResults: UseAdvancedResults = <T extends Document>(
 
   if (populate) request.populate(populate);
 
-  console.log(req.query);
-
   const data = await request;
 
   res.locals.advancedResults = ({ success: true, data, count, pagination });

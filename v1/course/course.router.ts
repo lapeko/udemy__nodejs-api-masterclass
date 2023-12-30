@@ -5,15 +5,17 @@ import {
   getCourseById,
   createCourseByBootcampId,
   patchCourse,
-  deleteCourse,
+  deleteCourse, getBootcampCourses,
 } from "./course.controller";
 import {auth} from "../../middleware/auth";
+import {useAdvancedResults} from "../../middleware/use-advanced-results";
+import {Course} from "./course.model";
 
 export const courseRouter = Router({ mergeParams: true });
 
 courseRouter
   .route("/")
-  .get(getAllCourses)
+  .get(useAdvancedResults(Course, [{path: "bootcamp", select: "name description"}]), getAllCourses)
   .post(auth("publisher", "admin"), createCourseByBootcampId);
 
 courseRouter
@@ -21,3 +23,5 @@ courseRouter
   .get(getCourseById)
   .patch(auth("publisher", "admin"), patchCourse)
   .delete(auth("publisher", "admin"), deleteCourse);
+
+courseRouter.get("/:bootcampId/bootcampCourses", getBootcampCourses);
