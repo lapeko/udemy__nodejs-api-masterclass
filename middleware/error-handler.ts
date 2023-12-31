@@ -22,7 +22,7 @@ export const errorHandlerMiddleware: ErrorRequestHandler = (
     error = new ErrorResponse(
       400,
       Object.values(err.errors)
-        .map((e) => (e as any).properties.message)
+        .map((e) => (e as any)?.message || (e as any).properties?.message)
         .join(", ")
     );
   else if (err.name === "MongoServerError" && err.code === 11000) {
