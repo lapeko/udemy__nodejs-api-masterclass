@@ -100,8 +100,9 @@ export const patchBootcamp: RequestHandler = asyncHandler(async (req, res) => {
   if (bootcampToUpdate.user.toString() !== res.locals.user._id.toString() && res.locals.user.role !== "admin")
     throw new ErrorResponse(401, `User with ID ${res.locals.user._id} is not authorized to update given bootcamp`);
 
-  const data = await bootcampToUpdate.updateOne(req.body, { new: true, runValidators: true });
+  Object.assign(bootcampToUpdate, req.body);
 
+  const data = await bootcampToUpdate.save();
 
   res.json({ success: true, data });
 });
