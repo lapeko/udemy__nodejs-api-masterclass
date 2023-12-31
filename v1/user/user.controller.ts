@@ -31,7 +31,7 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
   if (!email || !password)
     throw new ErrorResponse(400, "Login or password not provided");
 
-  const user = await User.findOne({email}).select("+password");
+  const user = await User.findOne({email: {$eq: email}}).select("+password");
 
   if (!user)
     throw new ErrorResponse(400, "Incorrect credentials");
