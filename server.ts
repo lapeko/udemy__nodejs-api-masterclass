@@ -19,6 +19,7 @@ import {EnvVariable, getEnvVariable} from "./utils/get-env-variable";
 
 const PORT = getEnvVariable(EnvVariable.PORT) || 3000;
 const NODE_ENV = getEnvVariable(EnvVariable.NODE_ENV);
+const publicPath = getEnvVariable(EnvVariable.PUBLIC_PATH);
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -33,10 +34,11 @@ const main = async () => {
   NODE_ENV === "development" && app.use(morgan("dev"));
 
   app.use(cors());
+  app.use(express.static(publicPath));
   app.use(limiter);
-  app.use(helmet());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
+  app.use(helmet());
   app.use(xss());
   app.use(hpp());
   app.use(cookieParser());
