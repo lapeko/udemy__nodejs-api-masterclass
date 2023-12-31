@@ -4,7 +4,11 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import hpp from "hpp";
 import "@colors/colors";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
+const xss = require("xss-clean");
 
 dotenv.config({ path: "./config/.env" });
 
@@ -16,6 +20,11 @@ import {EnvVariable, getEnvVariable} from "./utils/get-env-variable";
 const PORT = getEnvVariable(EnvVariable.PORT) || 3000;
 const NODE_ENV = getEnvVariable(EnvVariable.NODE_ENV);
 
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 200,
+});
+
 const main = async () => {
   await connect();
 
@@ -23,9 +32,13 @@ const main = async () => {
 
   NODE_ENV === "development" && app.use(morgan("dev"));
 
+  app.use(cors());
+  app.use(limiter);
   app.use(helmet());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
+  app.use(xss());
+  app.use(hpp());
   app.use(cookieParser());
   app.use(router);
   app.use(errorHandlerMiddleware);
