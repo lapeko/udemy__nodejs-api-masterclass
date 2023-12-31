@@ -10,18 +10,19 @@ import {
   getUserById,
   getUsers,
   loginUser,
+  logoutUser,
   resetPassword,
   updateUser,
   whoAmI
 } from "./user.controller";
 import {useAdvancedResults} from "../../middleware/use-advanced-results";
 import {User} from "./user.model";
-import {reviewRouter} from "../review/review.router";
 
 export const userRouter =  Router();
 
 userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
+userRouter.get("/logout", auth(), logoutUser);
 userRouter.get("/whoami", auth(), whoAmI);
 userRouter.post("/reset-password", resetPassword);
 userRouter.get("/confirm-reset-password/:token", confirmResetPassword);

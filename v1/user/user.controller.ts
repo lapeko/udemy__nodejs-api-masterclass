@@ -45,6 +45,19 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 /*
+ * @description:   Logout user
+ * @path:          "/api/v1/user/logout"
+ * @method:        GET
+ */
+export const logoutUser: RequestHandler = asyncHandler(async (req, res) => {
+  res.cookie("token", "none", {
+    expires: new Date(0),
+    httpOnly: true,
+  });
+  res.json({success: true, data: null});
+});
+
+/*
  * @description:   Response with a user based on a token
  * @path:          "/api/v1/user/whoami"
  * @method:        GET
@@ -225,7 +238,7 @@ const sendResWithToken = <T>(user: IUserDocument, res: Response): void => {
 
   res
     .cookie("token", token, options)
-  .json({success: true, data: token});
+    .json({success: true, data: token});
 }
 
 
